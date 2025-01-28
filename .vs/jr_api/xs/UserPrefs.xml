@@ -1,30 +1,29 @@
 ﻿<Properties StartupConfiguration="{C7AC91BA-67A4-473C-B987-4D2DF9CA1510}|http">
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.jr__api PreferredExecutionTarget="/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workbench ActiveDocument="jr_api/Controllers/Profile.cs">
     <Files>
-      <File FileName="jr_api/Program.cs" Line="65" Column="32" />
-      <File FileName="jr_api/Models/Usuario.cs" Line="4" Column="22" />
+      <File FileName="jr_api/Program.cs" />
+      <File FileName="jr_api/Models/Usuario.cs" />
       <File FileName="jr_api/Models/Rol.cs" />
       <File FileName="jr_api/Models/Permiso.cs" />
       <File FileName="jr_api/Models/UsuarioRol.cs" />
       <File FileName="jr_api/Models/RolPermiso.cs" />
-      <File FileName="jr_api/Data/ApplicationDbContext.cs" Line="8" Column="21" />
+      <File FileName="jr_api/Data/ApplicationDbContext.cs" />
       <File FileName="jr_api/appsettings.json" />
-      <File FileName="jr_api/Controllers/AuthController.cs" Line="33" Column="9" />
-      <File FileName="jr_api/Controllers/Profile.cs" Line="107" Column="14" />
+      <File FileName="jr_api/Controllers/AuthController.cs" />
+      <File FileName="jr_api/Controllers/Profile.cs" Line="144" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="jr_api" expanded="True">
             <Node name="jr_api">
-              <Node name="Controllers">
+              <Node name="Controllers" expanded="True">
                 <Node name="Profile.cs" selected="True" />
               </Node>
               <Node name="Data" expanded="True" />
@@ -35,4 +34,5 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.jr__api PreferredExecutionTarget="/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app" />
 </Properties>
