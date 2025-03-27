@@ -100,6 +100,10 @@ public class Proyecto
     public decimal? UtilidadReal { get; set; }
     public decimal? Financiamiento { get; set; }
 
+    public int? LiderProyectoId { get; set; }
+    public string? Entregables { get; set; }
+    public string? Cronograma { get; set; }
+
     public string? CierreProyectoActaEntrega { get; set; }
 
     // Clave foránea para EstatusProyecto

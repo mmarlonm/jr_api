@@ -132,7 +132,10 @@ public class ProyectoController : ControllerBase
                 p.Financiamiento,
 
                 p.CierreProyectoActaEntrega,
-                p.Estatus
+                p.Estatus,
+                p.Entregables,
+                p.Cronograma,
+                p.LiderProyectoId
             })
             .FirstOrDefaultAsync();
 
@@ -211,7 +214,10 @@ public class ProyectoController : ControllerBase
                 Financiamiento = request.Financiamiento,
 
                 CierreProyectoActaEntrega = request.CierreProyectoActaEntrega,
-                Estatus = request.Estatus
+                Estatus = request.Estatus,
+                LiderProyectoId = request.LiderProyectoId,
+                Entregables = request.Entregables,
+                Cronograma = request.Cronograma
             };
 
             _context.Proyectos.Add(proyecto);
@@ -279,6 +285,10 @@ public class ProyectoController : ControllerBase
             proyecto.Financiamiento = request.Financiamiento;
 
             proyecto.CierreProyectoActaEntrega = request.CierreProyectoActaEntrega;
+
+            proyecto.LiderProyectoId = request.LiderProyectoId;
+            proyecto.Entregables = request.Entregables;
+            proyecto.Cronograma = request.Cronograma;
 
             // ⚠️ SOLO SI CAMBIA EL ESTATUS: Registrar en historial
             if (estatusAnterior != estatusNuevo)
@@ -507,7 +517,7 @@ public class ProyectoController : ControllerBase
         public DateTime? FechaFin { get; set; }
         public string Estado { get; set; }
 
-        public int? Cliente { get; set; }
+        public int? Cliente { get; set; } 
         public string? Necesidad { get; set; }
         public string? Direccion { get; set; }
         public string? NombreContacto { get; set; }
@@ -554,6 +564,10 @@ public class ProyectoController : ControllerBase
 
         public string? CierreProyectoActaEntrega { get; set; }
         public int Estatus { get; set; }
+
+        public int? LiderProyectoId { get; set; }
+        public string? Entregables { get; set; }
+        public string? Cronograma { get; set; }
     }
 
     public class ProyectoArchivoDTO

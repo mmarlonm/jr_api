@@ -18,44 +18,59 @@ public class CotizacionController : ControllerBase
 
     // Obtener todas las cotizaciones
     [HttpGet("cotizaciones")]
-public async Task<IActionResult> GetCotizaciones()
-{
-    var cotizaciones = await _context.Cotizaciones
-        .Join(
-            _context.EstatusCotizacion,
-            c => c.Estatus,
-            e => e.Id,
-            (c, e) => new
-            {
-                c.CotizacionId,
-                c.Cliente,
-                c.Prospecto,
-                c.UsuarioCreadorId,
-                c.Necesidad,
-                c.Direccion,
-                c.NombreContacto,
-                c.Telefono,
-                c.Empresa,
-                c.Cotizacion,
-                c.OrdenCompra,
-                c.Contrato,
-                c.Proveedor,
-                c.Vendedor,
-                c.FechaEntrega,
-                c.RutaCritica,
-                c.Factura,
-                c.Pago,
-                c.UtilidadProgramada,
-                c.UtilidadReal,
-                c.Financiamiento,
-                c.FechaRegistro,
-                Estatus = e.Nombre // 🔹 Agrega el nombre del estatus en lugar del ID
-            }
-        )
-        .ToListAsync();
+    public async Task<IActionResult> GetCotizaciones()
+    {
+        var cotizaciones = await _context.Cotizaciones
+    .GroupJoin(
+        _context.EstatusCotizacion,
+        c => c.Estatus,
+        e => e.Id,
+        (c, estatusGroup) => new { c, estatusGroup }
+    )
+    .SelectMany(
+        x => x.estatusGroup.DefaultIfEmpty(), // LEFT JOIN con EstatusCotizacion
+        (x, e) => new { x.c, Estatus = e != null ? e.Nombre : "Sin Estatus" }
+    )
+    .GroupJoin(
+        _context.Clientes,  // Tabla de clientes
+        c => c.c.Cliente,   // Clave foránea en Cotizaciones
+        cl => cl.ClienteId, // Clave primaria en Clientes
+        (c, clienteGroup) => new { c, clienteGroup }
+    )
+    .SelectMany(
+        x => x.clienteGroup.DefaultIfEmpty(), // LEFT JOIN con Clientes
+        (x, cl) => new
+        {
+            x.c.c.CotizacionId,
+            x.c.c.Cliente,
+            NombreCliente = cl != null ? cl.Nombre : "Sin Cliente", // Nombre del Cliente
+            x.c.c.Prospecto,
+            x.c.c.UsuarioCreadorId,
+            x.c.c.Necesidad,
+            x.c.c.Direccion,
+            x.c.c.NombreContacto,
+            x.c.c.Telefono,
+            x.c.c.Empresa,
+            x.c.c.Cotizacion,
+            x.c.c.OrdenCompra,
+            x.c.c.Contrato,
+            x.c.c.Proveedor,
+            x.c.c.Vendedor,
+            x.c.c.FechaEntrega,
+            x.c.c.RutaCritica,
+            x.c.c.Factura,
+            x.c.c.Pago,
+            x.c.c.UtilidadProgramada,
+            x.c.c.UtilidadReal,
+            x.c.c.Financiamiento,
+            x.c.c.FechaRegistro,
+            x.c.Estatus
+        }
+    )
+    .ToListAsync();
 
-    return Ok(cotizaciones);
-}
+        return Ok(cotizaciones);
+    }
 
     // Obtener una cotización por ID
     [HttpGet("cotizacion/{id}")]
@@ -89,7 +104,7 @@ public async Task<IActionResult> GetCotizaciones()
     }
 
     // Eliminar una cotización
-    [HttpDelete("eliminar-cotizaciones/{id}")]
+    [HttpDelete("eliminar-cotizacion/{id}")]
     public async Task<IActionResult> DeleteCotizacion(int id)
     {
         var cotizacion = await _context.Cotizaciones.FindAsync(id);
