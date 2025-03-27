@@ -37,6 +37,8 @@ public class ProfileController : ControllerBase
                     u.UsuarioId,
                     u.NombreUsuario,
                     u.Email,
+                    u.Telefono,
+                    u.Activo,
                     Avatar = u.Avatar != null ? Convert.ToBase64String(u.Avatar) : null // Convertir avatar a Base64
                 })
                 .FirstOrDefault();
@@ -53,6 +55,7 @@ public class ProfileController : ControllerBase
     }
 
     [HttpPost("upload-avatar")]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> UploadAvatar([FromForm] IFormFile foto, [FromForm] int usuarioId)
     {
         if (foto == null || foto.Length == 0)
@@ -96,6 +99,8 @@ public class ProfileController : ControllerBase
 
         usuario.NombreUsuario = request.NombreUsuario ?? usuario.NombreUsuario;
         usuario.Email = request.Email ?? usuario.Email;
+        usuario.Telefono = request.Telefono ?? usuario.Telefono;
+        usuario.Activo = request.Activo ?? usuario.Activo;
 
         _context.Usuarios.Update(usuario);
         await _context.SaveChangesAsync();
@@ -137,13 +142,159 @@ public class ProfileController : ControllerBase
                 u.UsuarioId,
                 u.NombreUsuario,
                 u.Email,
+                u.Telefono,
+                u.Activo,
                 Avatar = u.Avatar != null
-                ? $"data:image/png;base64,{Convert.ToBase64String(u.Avatar)}"
-                : null
-             })
+                    ? $"data:image/png;base64,{Convert.ToBase64String(u.Avatar)}"
+                    : null,
+                RolId = _context.UsuarioRoles
+                    .Where(ur => ur.UsuarioId == u.UsuarioId)
+                    .Select(ur => ur.RolId)
+                    .FirstOrDefault(), // 🔹 Obtener el primer rol del usuario (si tiene varios, podrías manejarlo de otra manera)
+                NombreRol = (from ur in _context.UsuarioRoles
+                             join r in _context.Roles on ur.RolId equals r.RolId
+                             where ur.UsuarioId == u.UsuarioId
+                             select r.NombreRol).FirstOrDefault(),
+
+                // Incluir los proyectos creados por este usuario
+                ProyectosCreados = _context.Proyectos
+                    .Where(p => p.UsuarioId == u.UsuarioId)
+                    .Select(p => new
+                    {
+                        p.ProyectoId,
+                        p.Nombre,
+                        EstatusNombre = _context.EstatusProyecto
+                        .Where(ep => ep.Id == p.Estatus)
+                        .Select(ep => ep.Nombre) // Nombre del estatus
+                        .FirstOrDefault(),
+                        p.FechaCreacion
+
+                    })
+                    .ToList()
+            })
             .ToListAsync();
 
         return Ok(usuarios);
+    }
+
+    // POST api/usuario/crear
+    [HttpPost("created-user")]
+    public async Task<IActionResult> CrearUsuario([FromBody] CrearUsuarioRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest("Datos inválidos.");
+        }
+
+        // Convertir la imagen Base64 a byte[]
+        byte[] avatarBytes = null;
+        if (!string.IsNullOrEmpty(request.avatar))
+        {
+            try
+            {
+                string base64String = request.avatar.Contains(",")
+                    ? request.avatar.Split(',')[1]
+                    : request.avatar;
+
+                avatarBytes = Convert.FromBase64String(base64String);
+            }
+            catch (FormatException)
+            {
+                return BadRequest("Formato de imagen inválido.");
+            }
+        }
+
+        // 📌 Verificar si es un usuario nuevo o si estamos actualizando
+        if (request.usuarioId == 0)
+        {
+            // 1️⃣ Verificar si el correo ya está registrado
+            var usuarioExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == request.email);
+            if (usuarioExistente != null)
+            {
+                return Conflict("El correo electrónico ya está registrado.");
+            }
+
+            // 2️⃣ Generar una contraseña por defecto "123456" con hashing
+            var contrasenaPorDefecto = "123456";
+            var contrasenaHash = BCrypt.Net.BCrypt.HashPassword(contrasenaPorDefecto);
+
+            // 3️⃣ Crear el usuario
+            var nuevoUsuario = new Usuario
+            {
+                NombreUsuario = request.nombreUsuario,
+                Email = request.email,
+                Avatar = avatarBytes,
+                Telefono = request.telefono,
+                Activo = request.activo,
+                ContraseñaHash = contrasenaHash,
+                ContraseñaSalt = Guid.NewGuid().ToString()
+            };
+
+            _context.Usuarios.Add(nuevoUsuario);
+            await _context.SaveChangesAsync(); // Guardamos para generar el ID
+
+            // 4️⃣ Asignar el rol al usuario
+            var usuarioRol = new UsuarioRol
+            {
+                UsuarioId = nuevoUsuario.UsuarioId, // Se usa el ID generado
+                RolId = request.rolId
+            };
+
+            _context.UsuarioRoles.Add(usuarioRol);
+            await _context.SaveChangesAsync(); // Guardamos la relación usuario-rol
+
+            return Ok(new { UsuarioId = nuevoUsuario.UsuarioId, NombreUsuario = nuevoUsuario.NombreUsuario });
+        }
+        else
+        {
+            // 1️⃣ Buscar usuario existente por ID
+            var usuarioExistente = await _context.Usuarios.FindAsync(request.usuarioId);
+            if (usuarioExistente == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            // 2️⃣ Actualizar los datos del usuario
+            usuarioExistente.NombreUsuario = request.nombreUsuario;
+            usuarioExistente.Email = request.email;
+            usuarioExistente.Telefono = request.telefono;
+            usuarioExistente.Activo = request.activo;
+            if (avatarBytes != null) usuarioExistente.Avatar = avatarBytes;
+
+            _context.Usuarios.Update(usuarioExistente);
+            await _context.SaveChangesAsync();
+
+            // 3️⃣ Buscar relación usuario-rol existente
+            var usuarioRolExistente = await _context.UsuarioRoles
+                .FirstOrDefaultAsync(ur => ur.UsuarioId == usuarioExistente.UsuarioId);
+
+            if (usuarioRolExistente != null)
+            {
+                // ⚠️ Para cambiar el rol, primero eliminamos la relación anterior
+                _context.UsuarioRoles.Remove(usuarioRolExistente);
+                await _context.SaveChangesAsync();
+
+                // 🔹 Ahora asignamos el nuevo rol
+                _context.UsuarioRoles.Add(new UsuarioRol
+                {
+                    UsuarioId = usuarioExistente.UsuarioId,
+                    RolId = request.rolId
+                });
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Si no tenía rol, simplemente lo asignamos
+                _context.UsuarioRoles.Add(new UsuarioRol
+                {
+                    UsuarioId = usuarioExistente.UsuarioId,
+                    RolId = request.rolId
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { UsuarioId = usuarioExistente.UsuarioId, NombreUsuario = usuarioExistente.NombreUsuario });
+        }
     }
 }
 
@@ -157,6 +308,8 @@ public class UserUpdateRequest
 {
     public string? NombreUsuario { get; set; }
     public string? Email { get; set; }
+    public string? Telefono { get; set; }
+    public bool? Activo { get; set; }
     public int id { get; set; }
 }
 
@@ -166,4 +319,15 @@ public class PasswordUpdateRequest
     public string newPassword { get; set; }
     public string ConfirmPassword { get; set; }
     public int UsuarioId { get; set; }
+}
+
+public class CrearUsuarioRequest
+{
+    public string nombreUsuario { get; set; }
+    public string email { get; set; }
+    public string telefono { get; set; }
+    public bool activo { get; set; }
+    public string avatar { get; set; }
+    public int rolId { get; set; }  // El rol a asignar
+    public int usuarioId { get; set; }  // El rol a asignar
 }

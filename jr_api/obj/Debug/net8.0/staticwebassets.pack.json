@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/wwwroot/ArchivosProyectos/6/levantamiento/gantt-example.png",
+      "PackagePath": "staticwebassets/ArchivosProyectos/6/levantamiento/gantt-example.png"
+    },
+    {
       "Id": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },

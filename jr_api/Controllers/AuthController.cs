@@ -23,11 +23,17 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        var usuario = _context.Usuarios.SingleOrDefault(u => u.NombreUsuario == request.Username);
-        if (usuario == null) return Unauthorized("Usuario o contraseña incorrectos.");
+        // Buscar usuario por nombre de usuario
+        var usuario = _context.Usuarios.SingleOrDefault(u => u.Email == request.Username);
+        if (usuario == null)
+            return Unauthorized("Usuario o contraseña incorrectos.");
 
-        // Verificar contraseña usando bcrypt
-        if (!VerificarContraseña(request.Password, usuario.ContraseñaHash))
+        // Verificar si el usuario está activo
+        if (!usuario.Activo)
+            return Unauthorized("El usuario está inactivo. Contacta al administrador.");
+
+        // Verificar la contraseña usando bcrypt
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, usuario.ContraseñaHash))
             return Unauthorized("Usuario o contraseña incorrectos.");
 
         // Convertir avatar a Base64 con prefijo para <img src="">
@@ -35,27 +41,51 @@ public class AuthController : ControllerBase
             ? $"data:image/png;base64,{Convert.ToBase64String(usuario.Avatar)}"
             : null;
 
-        // Obtener roles asociados al usuario
+        // Obtener los roles asociados al usuario
         var roles = _context.UsuarioRoles
             .Where(ur => ur.UsuarioId == usuario.UsuarioId)
-            .Join(_context.Roles, ur => ur.RolId, r => r.RolId, (ur, r) => r.NombreRol)
+            .Select(ur => ur.Rol)
             .ToList();
 
-        // Obtener permisos asociados a los roles del usuario
+        // Obtener los permisos y vistas asociadas a los roles
         var permisos = _context.RolPermisos
-            .Where(rp => roles.Contains(rp.Rol.NombreRol))
-            .Join(_context.Permisos, rp => rp.PermisoId, p => p.PermisoId, (rp, p) => p.DescripcionPermiso)
+            .Where(rp => roles.Select(r => r.RolId).Contains(rp.RolId))
+            .Select(rp => new
+            {
+                rp.Permiso.PermisoId,
+                rp.Permiso.DescripcionPermiso,
+                rp.Permiso.Codigo,
+                Vista = rp.Vista != null ? new
+                {
+                    rp.Vista.VistaId,
+                    rp.Vista.NombreVista,
+                    rp.Vista.Ruta
+                } : null
+            })
             .ToList();
 
-        // Crear el token con roles y permisos como claims
-        var token = GenerarToken(usuario, roles, permisos);
+        // Obtener vistas permitidas
+        var vistas = _context.RolVistas
+            .Where(rv => roles.Select(r => r.RolId).Contains(rv.RolId))
+            .Select(rv => new
+            {
+                rv.Vista.VistaId,
+                rv.Vista.NombreVista,
+                rv.Vista.Ruta
+            })
+            .Distinct()
+            .ToList();
 
-        // Devolver token, roles y permisos
+        // Generar el token con la información del usuario
+        var token = GenerarToken(usuario, roles.Select(r => r.NombreRol).ToList(), permisos.Select(p => p.DescripcionPermiso).ToList());
+
+        // Devolver el token junto con la información del usuario, roles, permisos y vistas
         return Ok(new
         {
             Token = token,
-            Roles = roles,
+            Roles = roles.Select(r => r.NombreRol).ToList(),
             Permisos = permisos,
+            Vistas = vistas,
             Usuario = new
             {
                 Id = usuario.UsuarioId,

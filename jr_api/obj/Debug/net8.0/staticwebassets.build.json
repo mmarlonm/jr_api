@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "AowAOn/BJ5Fs7tyixrWFDi+L08q2nftCLl7P28iLcPY=",
+  "Hash": "aAEntWzAHbT/R+Zt4hkXe7t4eznch8GSsylJ4tCTWQQ=",
   "Source": "jr_api",
   "BasePath": "_content/jr_api",
   "Mode": "Default",
@@ -16,6 +16,25 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/wwwroot/ArchivosProyectos/6/levantamiento/gantt-example.png",
+      "SourceId": "jr_api",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/wwwroot/",
+      "BasePath": "_content/jr_api",
+      "RelativePath": "ArchivosProyectos/6/levantamiento/gantt-example.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/ArchivosProyectos/6/levantamiento/gantt-example.png"
+    },
     {
       "Identity": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/wwwroot/css/site.css",
       "SourceId": "jr_api",
