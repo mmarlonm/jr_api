@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using jr_api.Models;
+using static ProyectoController;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -68,6 +69,10 @@ public class ProspectoController : ControllerBase
             existing.AreaInteres = request.AreaInteres;
             existing.TipoEmpresa = request.TipoEmpresa;
             existing.UsuarioId = request.UsuarioId;
+            existing.ComoSeObtuvo = request.ComoSeObtuvo;
+            existing.Otros = request.Otros;
+            existing.PersonalSeguimiento = request.PersonalSeguimiento;
+
 
             _context.Prospectos.Update(existing);
         }

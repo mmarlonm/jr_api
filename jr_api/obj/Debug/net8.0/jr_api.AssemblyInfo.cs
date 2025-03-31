@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("jr_api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3c7400c8bca847786528090708afdef7588ed7c2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+543e72ff0b418ecbff6808268559a0a5b1798c4f")]
 [assembly: System.Reflection.AssemblyProductAttribute("jr_api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("jr_api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

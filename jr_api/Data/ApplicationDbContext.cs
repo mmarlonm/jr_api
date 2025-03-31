@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SeguimientoProspecto> SeguimientoProspectos { get; set; }
     public DbSet<ProyectoArchivo> ProyectoArchivo { get; set; }
     public DbSet<ProyectoEstatusHistorial> ProyectoEstatusHistorial { get; set; }
+    public DbSet<CotizacionesEstatusHistorial> CotizacionesEstatusHistorial { get; set; }
 
     // Método para configurar las relaciones entre las tablas
     protected override void OnModelCreating(ModelBuilder modelBuilder)

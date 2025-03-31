@@ -85,17 +85,111 @@ public class CotizacionController : ControllerBase
 
     // Crear o actualizar una cotización
     [HttpPost("guardar-cotizacion")]
-    public async Task<IActionResult> SaveCotizacion([FromBody] Cotizaciones cotizacion)
+    public async Task<IActionResult> SaveCotizacion([FromBody] CotizacionesDTO cotizacionDto)
     {
-        if (cotizacion == null)
+        if (cotizacionDto == null)
             return BadRequest("Datos inválidos.");
 
-        if (cotizacion.CotizacionId == 0)
+        Cotizaciones cotizacion;
+
+        if (cotizacionDto.CotizacionId == 0)
         {
+            // Nueva cotización
+            cotizacion = new Cotizaciones
+            {
+                Cliente = cotizacionDto.Cliente,
+                Prospecto = cotizacionDto.Prospecto,
+                UsuarioCreadorId = cotizacionDto.UsuarioCreadorId,
+                Necesidad = cotizacionDto.Necesidad,
+                Direccion = cotizacionDto.Direccion,
+                NombreContacto = cotizacionDto.NombreContacto,
+                Telefono = cotizacionDto.Telefono,
+                Empresa = cotizacionDto.Empresa,
+                Cotizacion = cotizacionDto.Cotizacion,
+                OrdenCompra = cotizacionDto.OrdenCompra,
+                Contrato = cotizacionDto.Contrato,
+                Proveedor = cotizacionDto.Proveedor,
+                Vendedor = cotizacionDto.Vendedor,
+                FechaEntrega = cotizacionDto.FechaEntrega,
+                RutaCritica = cotizacionDto.RutaCritica,
+                Factura = cotizacionDto.Factura,
+                Pago = cotizacionDto.Pago,
+                UtilidadProgramada = cotizacionDto.UtilidadProgramada,
+                UtilidadReal = cotizacionDto.UtilidadReal,
+                Financiamiento = cotizacionDto.Financiamiento,
+                FechaRegistro = DateTime.UtcNow,
+                Estatus = cotizacionDto.Estatus,
+                FormaPago = cotizacionDto.FormaPago,
+                TiempoEntrega = cotizacionDto.TiempoEntrega,
+                MontoTotal = cotizacionDto.MontoTotal,
+                AjustesCostos = cotizacionDto.AjustesCostos,
+                Comentarios = cotizacionDto.Comentarios
+            };
+
             _context.Cotizaciones.Add(cotizacion);
         }
         else
         {
+            // Actualización de cotización existente
+            cotizacion = await _context.Cotizaciones
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.CotizacionId == cotizacionDto.CotizacionId);
+
+            if (cotizacion == null)
+                return NotFound("Cotización no encontrada.");
+
+            var estatusAnterior = cotizacion.Estatus;
+            var estatusNuevo = cotizacionDto.Estatus;
+
+            // ⚠️ SOLO SI CAMBIA EL ESTATUS: Registrar en historial
+            if (estatusAnterior != estatusNuevo)
+            {
+                var historial = new CotizacionesEstatusHistorial
+                {
+                    CotizacionId = cotizacionDto.CotizacionId,
+                    EstatusAnteriorId = estatusAnterior,
+                    EstatusNuevoId = estatusNuevo,
+                    Comentarios = cotizacionDto.Comentarios ?? "Cambio de estatus",
+                    FechaCambio = DateTime.UtcNow,
+                    UsuarioId = cotizacionDto.UsuarioCreadorId?.ToString() ?? "Sistema"
+                };
+
+                _context.CotizacionesEstatusHistorial.Add(historial);
+            }
+
+            // Actualizar la entidad
+            cotizacion = new Cotizaciones
+            {
+                CotizacionId = cotizacionDto.CotizacionId,
+                Cliente = cotizacionDto.Cliente,
+                Prospecto = cotizacionDto.Prospecto,
+                UsuarioCreadorId = cotizacionDto.UsuarioCreadorId,
+                Necesidad = cotizacionDto.Necesidad,
+                Direccion = cotizacionDto.Direccion,
+                NombreContacto = cotizacionDto.NombreContacto,
+                Telefono = cotizacionDto.Telefono,
+                Empresa = cotizacionDto.Empresa,
+                Cotizacion = cotizacionDto.Cotizacion,
+                OrdenCompra = cotizacionDto.OrdenCompra,
+                Contrato = cotizacionDto.Contrato,
+                Proveedor = cotizacionDto.Proveedor,
+                Vendedor = cotizacionDto.Vendedor,
+                FechaEntrega = cotizacionDto.FechaEntrega,
+                RutaCritica = cotizacionDto.RutaCritica,
+                Factura = cotizacionDto.Factura,
+                Pago = cotizacionDto.Pago,
+                UtilidadProgramada = cotizacionDto.UtilidadProgramada,
+                UtilidadReal = cotizacionDto.UtilidadReal,
+                Financiamiento = cotizacionDto.Financiamiento,
+                FechaRegistro = cotizacionDto.FechaRegistro,
+                Estatus = cotizacionDto.Estatus,
+                FormaPago = cotizacionDto.FormaPago,
+                TiempoEntrega = cotizacionDto.TiempoEntrega,
+                MontoTotal = cotizacionDto.MontoTotal,
+                AjustesCostos = cotizacionDto.AjustesCostos,
+                Comentarios = cotizacionDto.Comentarios
+            };
+
             _context.Cotizaciones.Update(cotizacion);
         }
 
@@ -120,5 +214,23 @@ public class CotizacionController : ControllerBase
     {
         var estatus = await _context.EstatusCotizacion.ToListAsync();
         return Ok(estatus);
+    }
+
+    [HttpGet("historial-estatus/{id}")]
+    public async Task<IActionResult> GetHistorialEstatus(int id)
+    {
+        var historial = await _context.CotizacionesEstatusHistorial
+            .Where(h => h.CotizacionId == id)
+            .OrderByDescending(h => h.FechaCambio)
+            .Select(h => new CotizacionesEstatusHistorialDTO
+            {
+                EstatusAnterior = h.EstatusAnterior.Nombre,
+                EstatusNuevo = h.EstatusNuevo.Nombre,
+                FechaCambio = h.FechaCambio,
+                Comentarios = h.Comentarios
+            })
+            .ToListAsync();
+
+        return Ok(historial);
     }
 }
