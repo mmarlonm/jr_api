@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+
+  <ItemGroup>
+    <Compile Remove="IServices\IPermisoService.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.12" />
@@ -32,8 +36,5 @@
     <Folder Include="Models\" />
     <Folder Include="Data\" />
     <Folder Include="Controllers\" />
-    <Folder Include="IServices\" />
-    <Folder Include="Services\" />
-    <Folder Include="DTOs\" />
   </ItemGroup>
 </Project>
