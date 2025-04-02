@@ -194,6 +194,80 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "ProductoController",
+    "Method": "DeleteProducto",
+    "RelativePath": "api/Producto/delete-producto/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProductoController",
+    "Method": "GetProductoById",
+    "RelativePath": "api/Producto/get-producto/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProductoController",
+    "Method": "GetAllProductos",
+    "RelativePath": "api/Producto/getAll-productos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProductoController",
+    "Method": "SaveProducto",
+    "RelativePath": "api/Producto/save-producto",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ProductoDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProductoController",
+    "Method": "ImportExcel",
+    "RelativePath": "api/Producto/upload-excel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ProfileController",
     "Method": "UpdatePassword",
     "RelativePath": "api/Profile/change-password",
@@ -309,6 +383,22 @@
   },
   {
     "ContainingType": "ProspectoController",
+    "Method": "SaveNota",
+    "RelativePath": "api/Prospecto",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notaDto",
+        "Type": "NotaProspectoDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProspectoController",
     "Method": "AddSeguimiento",
     "RelativePath": "api/Prospecto/add-seguimiento",
     "HttpMethod": "POST",
@@ -318,6 +408,22 @@
       {
         "Name": "request",
         "Type": "SeguimientoProspecto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProspectoController",
+    "Method": "DeleteNota",
+    "RelativePath": "api/Prospecto/delete-nota/{notaId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notaId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -395,6 +501,38 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProspectoController",
+    "Method": "GetNotasByProspecto",
+    "RelativePath": "api/Prospecto/notas/{prospectoId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "prospectoId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProspectoController",
+    "Method": "SaveNota",
+    "RelativePath": "api/Prospecto/save-notes",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notaDto",
+        "Type": "NotaProspectoDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
