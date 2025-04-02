@@ -135,4 +135,86 @@ public class ProspectoController : ControllerBase
 
         return Ok(new { message = "Seguimiento eliminado correctamente." });
     }
+
+    /// <summary>
+    /// Obtiene todas las notas de un prospecto específico.
+    /// </summary>
+    [HttpGet("notas/{prospectoId}")]
+    public async Task<IActionResult> GetNotasByProspecto(int prospectoId)
+    {
+        var notas = await _context.NotasProspecto
+            .Where(n => n.ProspectoId == prospectoId)
+            .OrderByDescending(n => n.FechaCreacion)
+            .Select(n => new NotaProspectoDto
+            {
+                IdNote = n.NotaId,
+                ProspectoId = n.ProspectoId,
+                UsuarioId = n.UsuarioId,
+                NombreUsuario = n.Usuario.NombreUsuario, // Asumiendo que tienes una relación con Usuario
+                Title = n.Titulo,
+                Content = n.Contenido,
+                FechaCreacion = n.FechaCreacion
+            })
+            .ToListAsync();
+
+        return Ok(notas);
+    }
+
+    /// <summary>
+    /// Crea o actualiza una nota de prospecto.
+    /// </summary>
+    [HttpPost]
+    [HttpPost("save-notes")]
+    public async Task<IActionResult> SaveNota([FromBody] NotaProspectoDto notaDto)
+    {
+        if (notaDto == null)
+            return BadRequest("Datos inválidos.");
+
+        if (notaDto.IdNote == 0) // Nueva nota
+        {
+            var nuevaNota = new NotaProspecto
+            {
+                ProspectoId = notaDto.ProspectoId,
+                UsuarioId = notaDto.UsuarioId,
+                Titulo = notaDto.Title,
+                Contenido = notaDto.Content,
+                FechaCreacion = DateTime.UtcNow
+            };
+
+            _context.NotasProspecto.Add(nuevaNota);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Nota creada exitosamente" });
+        }
+        else // Edición de nota existente
+        {
+            var notaExistente = await _context.NotasProspecto.FindAsync(notaDto.IdNote);
+            if (notaExistente == null)
+                return NotFound("Nota no encontrada.");
+
+            notaExistente.Titulo = notaDto.Title;
+            notaExistente.Contenido = notaDto.Content;
+
+            _context.NotasProspecto.Update(notaExistente);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Nota actualizada exitosamente" });
+        }
+    }
+
+    /// <summary>
+    /// Elimina una nota de prospecto por su ID.
+    /// </summary>
+    [HttpDelete("delete-nota/{notaId}")]
+    public async Task<IActionResult> DeleteNota(int notaId)
+    {
+        var nota = await _context.NotasProspecto.FindAsync(notaId);
+        if (nota == null)
+        {
+            return NotFound(new { message = "Nota no encontrada." });
+        }
+
+        _context.NotasProspecto.Remove(nota);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Nota eliminada exitosamente." });
+    }
 }
