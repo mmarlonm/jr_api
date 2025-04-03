@@ -5,16 +5,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using jr_api.Models;
 using static ProyectoController;
+using jr_api.IServices;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ProspectoController : ControllerBase
+
 {
     private readonly ApplicationDbContext _context;
+    private readonly IProspectoService _ProspectoService;
 
-    public ProspectoController(ApplicationDbContext context)
+
+    public ProspectoController(ApplicationDbContext context, IProspectoService prospectoService)
     {
         _context = context;
+        _ProspectoService = prospectoService;
+
     }
 
     // -------------------- PROSPECTOS --------------------
@@ -23,8 +29,7 @@ public class ProspectoController : ControllerBase
     [HttpGet("getAll-prospectos")]
     public async Task<IActionResult> GetAllProspectos()
     {
-        var prospectos = await _context.Prospectos
-            .ToListAsync();
+        var prospectos = await _ProspectoService.GetAllProspectos();
 
         return Ok(prospectos);
     }
@@ -33,12 +38,11 @@ public class ProspectoController : ControllerBase
     [HttpGet("get-prospecto/{id}")]
     public async Task<IActionResult> GetProspectoById(int id)
     {
-        var prospecto = await _context.Prospectos
-            .FirstOrDefaultAsync(p => p.ProspectoId == id);
-
-        if (prospecto == null)
-            return NotFound("Prospecto no encontrado.");
-
+        var prospecto = await _ProspectoService.GetProspectoById(id);
+       if (prospecto == null)
+        {
+            return NotFound("No existe prospecto");
+        }
         return Ok(prospecto);
     }
 
@@ -48,36 +52,11 @@ public class ProspectoController : ControllerBase
     {
         if (request == null)
             return BadRequest("Datos inválidos.");
-
-        if (request.ProspectoId == 0)
-        {
-            request.FechaRegistro = DateTime.UtcNow;
-            _context.Prospectos.Add(request);
-        }
-        else
-        {
-            var existing = await _context.Prospectos.FindAsync(request.ProspectoId);
-            if (existing == null)
-                return NotFound("Prospecto no encontrado.");
-
-            existing.Empresa = request.Empresa;
-            existing.Contacto = request.Contacto;
-            existing.Telefono = request.Telefono;
-            existing.Puesto = request.Puesto;
-            existing.GiroEmpresa = request.GiroEmpresa;
-            existing.Email = request.Email;
-            existing.AreaInteres = request.AreaInteres;
-            existing.TipoEmpresa = request.TipoEmpresa;
-            existing.UsuarioId = request.UsuarioId;
-            existing.ComoSeObtuvo = request.ComoSeObtuvo;
-            existing.Otros = request.Otros;
-            existing.PersonalSeguimiento = request.PersonalSeguimiento;
+        var prospecto = _ProspectoService.SaveProspecto(request);
+        if (prospecto == null)
+            return BadRequest("El prospecto no existe");
 
 
-            _context.Prospectos.Update(existing);
-        }
-
-        await _context.SaveChangesAsync();
         return Ok(new { message = "Prospecto guardado correctamente." });
     }
 
