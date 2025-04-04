@@ -4670,32 +4670,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\catbl\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/Users/marlonjgs/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\catbl\\OneDrive\\Documents\\DEV\\API\\jr_api\\jr_api\\jr_api.csproj",
+      "projectUniqueName": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/jr_api.csproj",
       "projectName": "jr_api",
-      "projectPath": "C:\\Users\\catbl\\OneDrive\\Documents\\DEV\\API\\jr_api\\jr_api\\jr_api.csproj",
-      "packagesPath": "C:\\Users\\catbl\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\catbl\\OneDrive\\Documents\\DEV\\API\\jr_api\\jr_api\\obj\\",
+      "projectPath": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/jr_api.csproj",
+      "packagesPath": "/Users/marlonjgs/.nuget/packages/",
+      "outputPath": "/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\catbl\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/marlonjgs/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4708,13 +4700,7 @@
         "warnAsError": [
           "NU1605"
         ]
-      },
-      "restoreAuditProperties": {
-        "enableAudit": "true",
-        "auditLevel": "low",
-        "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.200"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -4770,7 +4756,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -52,7 +52,7 @@ public class ProspectoController : ControllerBase
     {
         if (request == null)
             return BadRequest("Datos inválidos.");
-        var prospecto = _ProspectoService.SaveProspecto(request);
+        var prospecto = await _ProspectoService.SaveProspecto(request);
         if (prospecto == null)
             return BadRequest("El prospecto no existe");
 

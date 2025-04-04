@@ -21,6 +21,9 @@ namespace jr_api.Services
         {
             var proyectos = new List<AnaliticaResumenProyecto>();
             var cotizaciones = new List<AnaliticaResumenCotizacion>();
+            int totalProspectos = 0;
+            int totalClientes = 0;
+            int totalProductos = 0;
 
             using (var connection = _context.Database.GetDbConnection())
             {
@@ -44,7 +47,7 @@ namespace jr_api.Services
                             });
                         }
 
-                        // Siguiente resultset: Cotizaciones por estatus
+                        // Segundo resultset: Cotizaciones por estatus
                         if (await reader.NextResultAsync())
                         {
                             while (await reader.ReadAsync())
@@ -57,6 +60,14 @@ namespace jr_api.Services
                                 });
                             }
                         }
+
+                        // Tercer resultset: Totales de prospectos, clientes y productos
+                        if (await reader.NextResultAsync() && await reader.ReadAsync())
+                        {
+                            totalProspectos = reader.GetInt32(0);
+                            totalClientes = reader.GetInt32(1);
+                            totalProductos = reader.GetInt32(2);
+                        }
                     }
                 }
             }
@@ -64,7 +75,10 @@ namespace jr_api.Services
             return new ResumenAnaliticoDto
             {
                 Proyectos = proyectos,
-                Cotizaciones = cotizaciones
+                Cotizaciones = cotizaciones,
+                TotalProspectos = totalProspectos,
+                TotalClientes = totalClientes,
+                TotalProductos = totalProductos
             };
         }
     }

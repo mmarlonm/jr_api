@@ -1,68 +1,78 @@
 ﻿<Properties StartupConfiguration="{C7AC91BA-67A4-473C-B987-4D2DF9CA1510}|http">
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/Controllers/ClienteController.cs" relfile="jr_api/Controllers/ClienteController.cs" line="124" column="1" />
-    </BreakpointStore>
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.ItemProperties.jr__api PreferredExecutionTarget="/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="jr_api/Controllers/ClienteController.cs">
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workbench ActiveDocument="jr_api/Controllers/ProspectoController.cs">
     <Files>
-      <File FileName="jr_api/Models/Usuario.cs" Line="4" Column="22" />
+      <File FileName="jr_api/Models/Usuario.cs" />
       <File FileName="jr_api/Models/UsuarioRol.cs" />
       <File FileName="jr_api/Models/RolPermiso.cs" />
-      <File FileName="jr_api/Data/ApplicationDbContext.cs" Line="25" Column="35" />
+      <File FileName="jr_api/Data/ApplicationDbContext.cs" Line="30" Column="61" />
       <File FileName="jr_api/Dockerfile" />
       <File FileName="jr_api/Controllers/RolController.cs" />
-      <File FileName="jr_api/Controllers/Profile.cs" Line="139" Column="36" />
-      <File FileName="jr_api/Controllers/AuthController.cs" Line="32" Column="28" />
+      <File FileName="jr_api/Controllers/Profile.cs" Line="1" Column="1" />
+      <File FileName="jr_api/Controllers/AuthController.cs" Line="27" Column="1" />
       <File FileName="jr_api/Models/Categoria.cs" />
-      <File FileName="jr_api/Models/Proyecto.cs" Line="103" Column="43" />
       <File FileName="jr_api/Models/UnidadDeNegocio.cs" />
       <File FileName="jr_api/Models/Vista.cs" />
       <File FileName="jr_api/Models/RolVista.cs" />
       <File FileName="jr_api/Models/Rol.cs" />
       <File FileName="jr_api/Models/Permiso.cs" />
-      <File FileName="jr_api/Models/Cliente.cs" Line="1" Column="1" />
-      <File FileName="jr_api/Controllers/ClienteController.cs" Line="183" Column="22" />
-      <File FileName="jr_api/appsettings.json" Line="14" Column="53" />
+      <File FileName="jr_api/Models/Cliente.cs" />
+      <File FileName="jr_api/appsettings.json" Line="9" Column="107" />
       <File FileName="jr_api/appsettings.Development.json" />
-      <File FileName="jr_api/Controllers/ProyectoController.cs" Line="457" Column="42" />
-      <File FileName="jr_api/Models/Cotizacion.cs" Line="67" Column="31" />
-      <File FileName="jr_api/Controllers/CotizacionController.cs" Line="70" Column="20" />
+      <File FileName="jr_api/Models/Cotizacion.cs" />
       <File FileName="jr_api/Models/EstatusCotizacion.cs" />
       <File FileName="jr_api/Models/EstatusProyecto.cs" />
-      <File FileName="jr_api/Models/Prospectos.cs" Line="20" Column="62" />
+      <File FileName="jr_api/Models/Prospectos.cs" />
       <File FileName="jr_api/Models/SeguimientoProspecto.cs" />
-      <File FileName="jr_api/Controllers/ProspectoController.cs" Line="58" Column="53" />
+      <File FileName="jr_api/Controllers/ProspectoController.cs" Line="165" Column="19" />
       <File FileName="jr_api/Models/ProyectoArchivo.cs" />
-      <File FileName="jr_api/IServices/IAnaliticaService.cs" Line="13" Column="73" />
+      <File FileName="jr_api/IServices/IAnaliticaService.cs" />
       <File FileName="jr_api/DTOs/ResumenAnaliticoDTO.cs" />
-      <File FileName="jr_api/Services/AnaliticaService.cs" Line="22" Column="62" />
-      <File FileName="jr_api/Controllers/AnaliticaController.cs" Line="15" Column="30" />
-      <File FileName="jr_api/Models/ProyectoEstatusHistorial.cs" />
+      <File FileName="jr_api/Services/AnaliticaService.cs" />
+      <File FileName="jr_api/Controllers/AnaliticaController.cs" />
       <File FileName="jr_api/DTOs/ProyectoEstatusHistorialDto.cs" />
+      <File FileName="jr_api/Program.cs" Line="20" Column="61" />
+      <File FileName="jr_api/Services/ProspectoService.cs" Line="1" Column="1" />
+      <File FileName="jr_api/IServices/IProspectoService.cs" Line="6" Column="3" />
+      <File FileName="jr_api/Models/CotizacionesEstatusHistorial.cs" />
+      <File FileName="jr_api/DTOs/CotizacionesDTO.cs" />
+      <File FileName="jr_api/DTOs/CotizacionesEstatusHistorialDTO.cs" />
+      <File FileName="jr_api/Models/Producto.cs" />
+      <File FileName="jr_api/Services/ProductoService.cs" Line="29" Column="24" />
+      <File FileName="jr_api/Controllers/ProductoController.cs" Line="21" Column="63" />
+      <File FileName="jr_api/IServices/IProductoService.cs" />
+      <File FileName="jr_api/Controllers/ProyectoController.cs" Line="1" Column="1" />
+      <File FileName="jr_api/Models/NotaProspecto.cs" Line="5" Column="14" />
+      <File FileName="jr_api/DTOs/NotaProspectoDTO.cs" Line="1" Column="14" />
+      <File FileName="../../../../../../usr/local/share/dotnet/sdk/8.0.404/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets" Line="266" Column="5" />
+      <File FileName="jr_api/Controllers/ClienteController.cs" Line="159" Column="32" NotebookId="1" />
+      <File FileName="jr_api/Controllers/CotizacionController.cs" Line="88" Column="52" NotebookId="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="jr_api">
-            <Node name="jr_api">
+            <Node name="jr_api" expanded="True">
               <Node name="Controllers" expanded="True">
-                <Node name="ClienteController.cs" selected="True" />
+                <Node name="ProspectoController.cs" selected="True" />
               </Node>
               <Node name="Data" expanded="True" />
-              <Node name="Models" expanded="True" />
-              <Node name="Services" expanded="True" />
+              <Node name="IServices" expanded="True" />
             </Node>
           </Node>
         </State>
       </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
-      </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/Controllers/ClienteController.cs" relfile="jr_api/Controllers/ClienteController.cs" line="124" column="1" />
+      <Breakpoint file="/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/Controllers/CotizacionController.cs" relfile="jr_api/Controllers/CotizacionController.cs" line="89" column="1" />
+      <Breakpoint file="/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/Controllers/ProductoController.cs" relfile="jr_api/Controllers/ProductoController.cs" line="64" column="1" />
+      <Breakpoint file="/Users/marlonjgs/mgmDev/jr-site/api/jr_api/jr_api/Controllers/ProductoController.cs" relfile="jr_api/Controllers/ProductoController.cs" line="70" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
 </Properties>

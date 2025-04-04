@@ -2,6 +2,9 @@
 {
     public List<AnaliticaResumenProyecto> Proyectos { get; set; }
     public List<AnaliticaResumenCotizacion> Cotizaciones { get; set; }
+    public int TotalProspectos { get; set; }
+    public int TotalClientes { get; set; }
+    public int TotalProductos { get; set; }
 }
 
 public class AnaliticaResumenProyecto
