@@ -15,7 +15,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("jr_api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< Updated upstream
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f30db628bad59e46c1e2c98a5675c94bd33f8c76")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+214e018e4e2ef01d4141a1bbdb9727b78b9cff34")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("jr_api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("jr_api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

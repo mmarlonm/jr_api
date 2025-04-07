@@ -68,6 +68,89 @@ namespace jr_api.Services
                 return null;
             }
         }
+        public async Task<Object> DeleteProspecto(int id)
+        {
+            var prospecto = await _context.Prospectos.FindAsync(id);
+            if (prospecto == null)
+                return null;
+            _context.Prospectos.Remove(prospecto);
+            await _context.SaveChangesAsync();
+
+            return prospecto;
+        }
+        public async Task<Object> GetSeguimientos(int prospectoId)
+        {
+            var seguimientos = await _context.SeguimientoProspectos
+                .Where(s => s.ProspectoId == prospectoId)
+                .ToListAsync();
+
+            return seguimientos;
+        }
+        public async Task<Object> GetNotasByProspecto(int prospectoId)
+        {
+            var notas = await _context.NotasProspecto
+                .Where(n => n.ProspectoId == prospectoId)
+                .OrderByDescending(n => n.FechaCreacion)
+                .Select(n => new NotaProspectoDto
+                {
+                    IdNote = n.NotaId,
+                    ProspectoId = n.ProspectoId,
+                    UsuarioId = n.UsuarioId,
+                    NombreUsuario = n.Usuario.NombreUsuario, // Asumiendo que tienes una relación con Usuario
+                    Title = n.Titulo,
+                    Content = n.Contenido,
+                    FechaCreacion = n.FechaCreacion
+                })
+                .ToListAsync();
+
+            return notas;
+        }
+        public async Task<Object> SaveNota([FromBody] NotaProspectoDto notaDto)
+        {
+                       if (notaDto.IdNote == 0) // Nueva nota
+            {
+                var nuevaNota = new NotaProspecto
+                {
+                    ProspectoId = notaDto.ProspectoId,
+                    UsuarioId = notaDto.UsuarioId,
+                    Titulo = notaDto.Title,
+                    Contenido = notaDto.Content,
+                    FechaCreacion = DateTime.UtcNow
+                };
+
+                _context.NotasProspecto.Add(nuevaNota);
+                await _context.SaveChangesAsync();
+                return nuevaNota;
+            }
+            else // Edición de nota existente
+            {
+                var notaExistente = await _context.NotasProspecto.FindAsync(notaDto.IdNote);
+                if (notaExistente == null)
+                    return null;
+
+                notaExistente.Titulo = notaDto.Title;
+                notaExistente.Contenido = notaDto.Content;
+
+                _context.NotasProspecto.Update(notaExistente);
+                await _context.SaveChangesAsync();
+                return notaExistente;
+            }
+        }
+        public async Task<Object> DeleteNota(int notaId)
+        {
+            var nota = await _context.NotasProspecto.FindAsync(notaId);
+            if (nota == null)
+            {
+                return null;
+            }
+
+            _context.NotasProspecto.Remove(nota);
+            await _context.SaveChangesAsync();
+
+            return nota;
+        }
+
+
 
 
 
