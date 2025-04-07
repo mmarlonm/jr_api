@@ -28,6 +28,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<CotizacionesEstatusHistorial> CotizacionesEstatusHistorial { get; set; }
     public DbSet<Producto> Productos { get; set; }
     public DbSet<NotaProspecto> NotasProspecto { get; set; }
+
+    //tablas venta
+    public DbSet<Venta> Ventas { get; set; }
+    public DbSet<FormaDePago> FormasDePago { get; set; }
     // Método para configurar las relaciones entre las tablas
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
