@@ -26,5 +26,7 @@ public class Prospecto
 
     // 🔗 Propiedades de navegación
     public Usuario? Usuario { get; set; }         // FK hacia Usuario
+    public bool Active { get; set; }
+
     public ICollection<SeguimientoProspecto>? Seguimientos { get; set; }
 }

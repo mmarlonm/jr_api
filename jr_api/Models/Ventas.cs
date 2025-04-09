@@ -29,4 +29,6 @@ public class Venta
     public int UnidadDeNegocioId { get; set; }
     public UnidadDeNegocio UnidadDeNegocio { get; set; }
     public DateTime FechaRegistro { get; set; }
+    public bool Active { get; set; }
+
 }

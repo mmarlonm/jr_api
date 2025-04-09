@@ -11,7 +11,10 @@ public class VentaService : IVentaService
 
     public async Task<List<VentaParametrosDto>> ObtenerVentasAsync()
     {
+
         return await _context.Ventas
+             .Where(V => V.Active)
+
             .Include(v => v.Cliente)
             .Include(v => v.Agente)  // Cambio de Usuario a Agente
             .Include(v => v.UnidadDeNegocio)
@@ -136,8 +139,8 @@ public class VentaService : IVentaService
     {
         var venta = await _context.Ventas.FindAsync(id);
         if (venta == null) return false;
-
-        _context.Ventas.Remove(venta);
+        venta.Active = false;
+        _context.Ventas.Update(venta);
         await _context.SaveChangesAsync();
         return true;
     }
