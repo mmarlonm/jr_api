@@ -10,6 +10,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
 
   <ItemGroup>
+    <Compile Remove="IServices\FileName.cs" />
     <Compile Remove="IServices\IPermisoService.cs" />
   </ItemGroup>
   <ItemGroup>

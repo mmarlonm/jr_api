@@ -819,5 +819,73 @@
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VentaController",
+    "Method": "GetAll",
+    "RelativePath": "api/Venta",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VentaController",
+    "Method": "GetById",
+    "RelativePath": "api/Venta/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VentaController",
+    "Method": "Delete",
+    "RelativePath": "api/Venta/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VentaController",
+    "Method": "GetFormasDePago",
+    "RelativePath": "api/Venta/formas-de-pago",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VentaController",
+    "Method": "Create",
+    "RelativePath": "api/Venta/save-venta",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "VentaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]
