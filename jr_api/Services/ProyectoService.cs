@@ -1,18 +1,21 @@
 ﻿using jr_api.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NPOI.SS.Formula.Functions;
 using static ProyectoController;
 
 namespace jr_api.Services
 {
 
-    public class ProyectoService:IProyectoService
+    public class ProyectoService : IProyectoService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
         public ProyectoService(ApplicationDbContext context)
         {
             _context = context;
+            
         }
         public async Task<IEnumerable<Object>> GetUnidadesDeNegocio()
         {
@@ -293,8 +296,89 @@ namespace jr_api.Services
 
             return proyecto.ProyectoId ;
         }
+        public async Task<Object> DeleteProyecto(int id)
+        {
+            var proyecto = await _context.Proyectos.FindAsync(id);
+            if (proyecto == null)
+            {
+                return null;
+            }
 
+            // Eliminar las relaciones asociadas, si es necesario
+            var rolVistas = await _context.RolVistas.Where(rv => rv.VistaId == id).ToListAsync();
+            _context.RolVistas.RemoveRange(rolVistas);
 
+            var rolPermisos = await _context.RolPermisos.Where(rp => rp.VistaId == id).ToListAsync();
+            _context.RolPermisos.RemoveRange(rolPermisos);
+
+            _context.Proyectos.Remove(proyecto);
+            await _context.SaveChangesAsync();
+
+            return proyecto;
+        }
+        public async Task<Object> SubirArchivo( int proyectoId, string categoria,  IFormFile archivo)
+        {
+            Response res = new Response();
+
+            var proyecto = await _context.Proyectos.FindAsync(proyectoId);
+            if (proyecto == null)
+                return null;
+
+            try
+            {
+                // ✅ Leer la ruta base desde appsettings.json
+                var rutaBase = _configuration["RutaArchivos"]; // "/Users/marlonjgs/Documentos/archivos_jringenieria"
+
+                // Construir ruta completa
+                var folderPath = Path.Combine(rutaBase, proyectoId.ToString(), categoria);
+
+                // Crear carpeta si no existe
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var fileName = Path.GetFileName(archivo.FileName);
+                var filePath = Path.Combine(folderPath, fileName);
+
+                // Guardar archivo
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await archivo.CopyToAsync(stream);
+                }
+
+                // Ruta relativa para guardar en base de datos (opcionalmente podrías guardarla completa también)
+                var rutaRelativa = Path.Combine(proyectoId.ToString(), categoria, fileName).Replace("\\", "/");
+
+                var archivoProyecto = new ProyectoArchivo
+                {
+                    ProyectoId = proyectoId,
+                    Categoria = categoria,
+                    NombreArchivo = fileName,
+                    RutaArchivo = rutaRelativa,
+                    FechaSubida = DateTime.Now
+                };
+
+                _context.ProyectoArchivo.Add(archivoProyecto);
+                await _context.SaveChangesAsync();
+                res.Code = 200;
+                res.Message = "OK";
+                res.data = rutaRelativa;
+                return  res;
+            }
+            catch (Exception ex)
+            {
+                res.Code = 500;
+                res.Message = "Error al guardar archivo: " + ex;
+                res.data = "";
+                return res;
+            }
+        }
 
     }
+}
+
+public class Response
+{
+    public int Code { get; set; }
+    public string Message { get; set; }
+    public string data { get; set; }
 }
