@@ -11,7 +11,8 @@ namespace jr_api.IServices
         Task<IEnumerable<Object>> GetProyectos();
         Task<Object> GetProyectoById(int id);
         Task<Object> SaveProyecto([FromBody] ProyectoDTO request);
-
-
+        Task<Object> DeleteProyecto(int id);
+        Task<Object> SubirArchivo(int proyectoId, string categoria, IFormFile archivo);
+      
     }
 }
