@@ -73,7 +73,10 @@ public class Cotizaciones
     
     [ForeignKey("Estatus")]
     public EstatusCotizacion EstatusCotizacion { get; set; }
+    public bool Active { get; set; }
 
+        
     //relacion historial de estatus
     public ICollection<CotizacionesEstatusHistorial> CotizacionesEstatusHistorial { get; set; }
+    public ICollection<CotizacionArchivo> Archivos { get; set; }
 }

@@ -20,6 +20,10 @@ builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IProspectoService, ProspectoService>();
 builder.Services.AddScoped<IVentaService, VentaService>();
+builder.Services.AddScoped<IProyectoService, ProyectoService>();
+builder.Services.AddScoped<ICotizacionService, CotizacionService>();
+
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo

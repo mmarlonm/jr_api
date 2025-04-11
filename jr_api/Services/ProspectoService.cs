@@ -14,8 +14,12 @@ namespace jr_api.Services
         }
         public async Task<IEnumerable<object>> GetAllProspectos()
         {
+
             var prospectos = await _context.Prospectos
+                .Where(P => P.Active)
                 .ToListAsync();
+
+
 
             return prospectos;
         }
@@ -73,7 +77,9 @@ namespace jr_api.Services
             var prospecto = await _context.Prospectos.FindAsync(id);
             if (prospecto == null)
                 return null;
-            _context.Prospectos.Remove(prospecto);
+            prospecto.Active = false;
+            _context.Prospectos.Update(prospecto);
+
             await _context.SaveChangesAsync();
 
             return prospecto;
