@@ -28,6 +28,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<CotizacionesEstatusHistorial> CotizacionesEstatusHistorial { get; set; }
     public DbSet<Producto> Productos { get; set; }
     public DbSet<NotaProspecto> NotasProspecto { get; set; }
+    public DbSet<CotizacionArchivo> CotizacionArchivo { get; set; }
 
     //tablas venta
     public DbSet<Venta> Ventas { get; set; }

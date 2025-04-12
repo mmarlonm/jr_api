@@ -78,4 +78,5 @@ public class Cotizaciones
         
     //relacion historial de estatus
     public ICollection<CotizacionesEstatusHistorial> CotizacionesEstatusHistorial { get; set; }
+    public ICollection<CotizacionArchivo> Archivos { get; set; }
 }
