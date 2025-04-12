@@ -118,91 +118,37 @@ public class ProyectoController : ControllerBase
     [HttpGet("ObtenerArchivos/{proyectoId}")]
     public async Task<IActionResult> ObtenerArchivos(int proyectoId)
     {
-        var archivos = await _context.ProyectoArchivo
-            .Where(a => a.ProyectoId == proyectoId)
-            .OrderByDescending(a => a.FechaSubida)
-            .ToListAsync();
-
-        if (archivos == null || !archivos.Any())
-            return NotFound("No se encontraron archivos para este proyecto.");
+        var archivos = await _ProyectoService.ObtenerArchivos(proyectoId);
 
         return Ok(archivos);
     }
 
     [HttpGet("DescargarArchivo/{proyectoId}/{categoria}/{nombreArchivo}")]
-    public IActionResult DescargarArchivo(int proyectoId, string categoria, string nombreArchivo)
+    public async Task<IActionResult> DescargarArchivo(int proyectoId, string categoria, string nombreArchivo)
     {
-        try
-        {
-            // Leer la ruta base desde appsettings.json
-            var rutaBase = _configuration["RutaArchivos"]; // "/Users/marlonjgs/Documentos/archivos_jringenieria"
-
-            // Construir la ruta completa del archivo a descargar
-            var rutaRelativa = Path.Combine(proyectoId.ToString(), categoria, nombreArchivo).Replace("\\", "/");
-            var filePath = Path.Combine(rutaBase, rutaRelativa); // Ruta completa para acceder al archivo
-
-            // Verificar si el archivo existe
-            if (!System.IO.File.Exists(filePath))
+        dynamic proyecto = await _ProyectoService.DescargarArchivo(proyectoId, categoria, nombreArchivo);
+        // Verificar si el archivo existe
+        if (proyecto.Code == 500)
             {
-                return NotFound("Archivo no encontrado.");
+                return NotFound(proyecto.Message);
             }
-
-            // Leer el archivo como bytes
-            var archivoBytes = System.IO.File.ReadAllBytes(filePath);
-
-            // Definir el tipo de contenido (ajustar según el tipo de archivo)
-            var contentType = "application/octet-stream"; // Este puede ser ajustado según el tipo de archivo (PDF, DOCX, etc.)
-
-            // Realizar la descarga
-            return File(archivoBytes, contentType, nombreArchivo);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error al descargar archivo: {ex.Message}");
-        }
-    }
+         return Ok(File(proyecto.content, proyecto.contentType, proyecto.NombreArchivo));
+           }
 
     [HttpDelete("EliminarArchivo/{proyectoId}/{categoria}/{nombreArchivo}")]
     public async Task<IActionResult> EliminarArchivo(int proyectoId, string categoria, string nombreArchivo)
     {
-        try
+        var proyecto = await _ProyectoService.EliminarArchivo(proyectoId, categoria, nombreArchivo);
+        // Eliminar registro de la tabla si existe
+        if (proyecto.Code == 500)
         {
-            // Leer la ruta base desde appsettings.json
-            var rutaBase = _configuration["RutaArchivos"];
-
-            // Construir ruta relativa y completa
-            var rutaRelativa = Path.Combine(proyectoId.ToString(), categoria, nombreArchivo).Replace("\\", "/");
-            var filePath = Path.Combine(rutaBase, rutaRelativa);
-
-            // Eliminar archivo físico si existe
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
-
-            // Buscar el archivo en la base de datos
-            var archivoBD = await _context.ProyectoArchivo
-                .FirstOrDefaultAsync(a =>
-                    a.ProyectoId == proyectoId &&
-                    a.Categoria == categoria &&
-                    a.NombreArchivo == nombreArchivo);
-
-            // Eliminar registro de la tabla si existe
-            if (archivoBD != null)
-            {
-                _context.ProyectoArchivo.Remove(archivoBD);
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok("Archivo eliminado correctamente.");
+            return NotFound(proyecto.Message);
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error al eliminar archivo: {ex.Message}");
-        }
+        return Ok(proyecto.Message);
     }
 
-    [HttpGet("historial-estatus/{proyectoId}")]
+
+[HttpGet("historial-estatus/{proyectoId}")]
     public async Task<IActionResult> GetHistorialEstatus(int proyectoId)
     {
         var historial = await _context.ProyectoEstatusHistorial

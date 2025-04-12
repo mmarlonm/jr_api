@@ -13,6 +13,8 @@ namespace jr_api.IServices
         Task<Object> SaveProyecto([FromBody] ProyectoDTO request);
         Task<Object> DeleteProyecto(int id);
         Task<Object> SubirArchivo(int proyectoId, string categoria, IFormFile archivo);
-      
+        Task<Object> ObtenerArchivos(int proyectoId);
+        Task<Response> DescargarArchivo(int proyectoId, string categoria, string nombreArchivo);
+        Task<Response> EliminarArchivo(int proyectoId, string categoria, string nombreArchivo);
     }
 }

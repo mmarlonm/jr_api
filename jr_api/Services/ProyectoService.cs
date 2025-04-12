@@ -12,9 +12,10 @@ namespace jr_api.Services
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public ProyectoService(ApplicationDbContext context)
+        public ProyectoService(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
             
         }
         public async Task<IEnumerable<Object>> GetUnidadesDeNegocio()
@@ -372,6 +373,109 @@ namespace jr_api.Services
                 return res;
             }
         }
+        public async Task<Object> ObtenerArchivos(int proyectoId)
+        {
+            var archivos = await _context.ProyectoArchivo
+                .Where(a => a.ProyectoId == proyectoId)
+                .OrderByDescending(a => a.FechaSubida)
+                .ToListAsync();
+
+            if (archivos == null || !archivos.Any())
+                return null;
+
+            return archivos;
+        }
+        public async Task<Response> DescargarArchivo(int proyectoId, string categoria, string nombreArchivo)
+        {
+            Response res = new Response();
+            try
+            {
+                // Leer la ruta base desde appsettings.json
+                var rutaBase = _configuration["RutaArchivos"]; // "/Users/marlonjgs/Documentos/archivos_jringenieria"
+
+                // Construir la ruta completa del archivo a descargar
+                var rutaRelativa = Path.Combine(proyectoId.ToString(), categoria, nombreArchivo).Replace("\\", "/");
+                var filePath = Path.Combine(rutaBase, rutaRelativa); // Ruta completa para acceder al archivo
+
+                // Verificar si el archivo existe
+                if (!System.IO.File.Exists(filePath))
+                {
+                    res.Code = 500;
+                    res.Message = "Archivo no encontrado" ;
+                    res.data = "";
+                    return res;
+                }
+
+                // Leer el archivo como bytes
+                var archivoBytes = System.IO.File.ReadAllBytes(filePath);
+
+                // Definir el tipo de contenido (ajustar según el tipo de archivo)
+                var contentType = "application/octet-stream"; // Este puede ser ajustado según el tipo de archivo (PDF, DOCX, etc.)
+
+                // Realizar la descarga
+                res.Code = 200;
+                res.Message = "Ok";
+                res.content = archivoBytes;
+                res.contentType = contentType;
+                res.NombreArchivo = nombreArchivo;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Code = 500;
+                res.Message = "Error al descargar archivo: " + ex;
+                res.data = "";
+                return res;
+            }
+        }
+        public async Task<Response> EliminarArchivo(int proyectoId, string categoria, string nombreArchivo)
+        {
+            Response res = new Response();
+            try
+            {
+                // Leer la ruta base desde appsettings.json
+                var rutaBase = _configuration["RutaArchivos"];
+
+                // Construir ruta relativa y completa
+                var rutaRelativa = Path.Combine(proyectoId.ToString(), categoria, nombreArchivo).Replace("\\", "/");
+                var filePath = Path.Combine(rutaBase, rutaRelativa);
+
+                // Eliminar archivo físico si existe
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                // Buscar el archivo en la base de datos
+                var archivoBD = await _context.ProyectoArchivo
+                    .FirstOrDefaultAsync(a =>
+                        a.ProyectoId == proyectoId &&
+                        a.Categoria == categoria &&
+                        a.NombreArchivo == nombreArchivo);
+
+                // Eliminar registro de la tabla si existe
+                if (archivoBD != null)
+                {
+                    _context.ProyectoArchivo.Remove(archivoBD);
+                    await _context.SaveChangesAsync();
+                    res.Code = 200;
+                    res.Message = "Archivo eliminado correctamente";
+                    res.data = "";
+
+                }
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Code = 500;
+                res.Message = "Error al eliminar el archivo:" + ex;
+                res.data = "";
+                return res;
+              }
+        }
+
+
+
 
     }
 }
@@ -381,4 +485,7 @@ public class Response
     public int Code { get; set; }
     public string Message { get; set; }
     public string data { get; set; }
+    public byte[] content { get; set; }
+    public string contentType { get; set; }
+    public string NombreArchivo { get; set; }
 }
