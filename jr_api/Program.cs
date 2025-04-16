@@ -69,11 +69,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configura CORS para permitir solicitudes desde cualquier dominio
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy
+            .WithOrigins("http://localhost:4200", "https://mmarlonm.github.io") // TU frontend
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // Requerido para JWT con SignalR
     });
 });
 
@@ -89,16 +91,45 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+
+        // Permitir token en la query string para SignalR
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                // Verifica que sea una conexión a SignalR
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/chatHub"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 
 
 builder.Services.AddControllers();
 
+//hubs para chat
+builder.Services.AddSignalR();
+
+
+
 var app = builder.Build();
 // Usa CORS
-app.UseCors("AllowAll");
+app.UseCors("CorsPolicy");
+
+//config chat real time
+app.MapHub<ChatHub>("/chatHub");
+
 //app.UseSwagger();
 //app.UseSwaggerUI();
 

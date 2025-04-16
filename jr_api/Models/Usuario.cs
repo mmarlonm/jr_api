@@ -1,4 +1,6 @@
 ﻿using System;
+using NPOI.SS.Formula.Functions;
+
 namespace jr_api.Models
 {
         public class Usuario
