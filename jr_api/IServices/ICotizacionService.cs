@@ -1,4 +1,5 @@
 ﻿
+using jr_api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 public interface ICotizacionService
@@ -7,7 +8,7 @@ public interface ICotizacionService
     Task<Object> GetCotizacionById(int id);
     Task<Object> SaveCotizacion(CotizacionesDTO cotizacionDto);
     Task<Object> DeleteCotizacion(int id);
-    Task<IEnumerable<EstatusCotizacion>> GetEstatusCotizaciones();
+    Task<ResponseDTO> GetEstatusCotizaciones();
     Task<Object> GetHistorialEstatus(int id);
 
     }
