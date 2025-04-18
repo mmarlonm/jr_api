@@ -57,12 +57,6 @@ public class ProyectoController : ControllerBase
     {
         // Buscar el proyecto por su ID
         var proyecto = await _ProyectoService.GetProyectoById(id);
-        // Verificar si el proyecto existe
-        if (proyecto == null)
-        {
-            return NotFound("El proyecto no se encontró.");
-        }
-
         return Ok(proyecto);
     }
 
@@ -115,57 +109,10 @@ public class ProyectoController : ControllerBase
     [HttpPost("SubirArchivo")]
     public async Task<IActionResult> SubirArchivo([FromForm] int proyectoId, [FromForm] string categoria, [FromForm] IFormFile archivo)
     {
-        if (archivo == null || archivo.Length == 0)
-            return BadRequest("Archivo no proporcionado.");
-
-        var proyecto = await _context.Proyectos.FindAsync(proyectoId);
-        if (proyecto == null)
-            return NotFound("Proyecto no encontrado.");
-
-        try
-        {
-            // ✅ Leer la ruta base desde appsettings.json
-            var rutaBase = _configuration["RutaArchivos"]; // "/Users/marlonjgs/Documentos/archivos_jringenieria"
-
-            // Construir ruta completa
-            var folderPath = Path.Combine(rutaBase, proyectoId.ToString(), categoria);
-
-            // Crear carpeta si no existe
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            var fileName = Path.GetFileName(archivo.FileName);
-            var filePath = Path.Combine(folderPath, fileName);
-
-            // Guardar archivo
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await archivo.CopyToAsync(stream);
-            }
-
-            // Ruta relativa para guardar en base de datos (opcionalmente podrías guardarla completa también)
-            var rutaRelativa = Path.Combine(proyectoId.ToString(), categoria, fileName).Replace("\\", "/");
-
-            var archivoProyecto = new ProyectoArchivo
-            {
-                ProyectoId = proyectoId,
-                Categoria = categoria,
-                NombreArchivo = fileName,
-                RutaArchivo = rutaRelativa,
-                FechaSubida = DateTime.Now
-            };
-
-            _context.ProyectoArchivo.Add(archivoProyecto);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { mensaje = "Archivo subido exitosamente", ruta = rutaRelativa });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error al subir archivo: {ex.Message}");
-        }
+       
+        var proyecto = await _ProyectoService.SubirArchivo(proyectoId, categoria, archivo);
+        return Ok(proyecto);
     }
-
     [HttpGet("ObtenerArchivos/{proyectoId}")]
     public async Task<IActionResult> ObtenerArchivos(int proyectoId)
     {
@@ -191,11 +138,7 @@ public class ProyectoController : ControllerBase
     {
         var proyecto = await _ProyectoService.EliminarArchivo(proyectoId, categoria, nombreArchivo);
         // Eliminar registro de la tabla si existe
-        if (proyecto.Code == 500)
-        {
-            return NotFound(proyecto.Message);
-        }
-        return Ok(proyecto.Message);
+        return Ok(proyecto);
     }
 
 

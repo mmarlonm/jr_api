@@ -8,7 +8,7 @@ namespace jr_api.IServices
     {
         Task<IEnumerable<Object>> GetUnidadesDeNegocio();
         Task<IEnumerable<Object>> GetCategorias();
-        Task<IEnumerable<Object>> GetProyectos();
+        Task<Object> GetProyectos();
         Task<Object> GetProyectoById(int id);
         Task<Object> SaveProyecto([FromBody] ProyectoDTO request);
         Task<Object> DeleteProyecto(int id);

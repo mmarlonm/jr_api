@@ -28,8 +28,9 @@ namespace jr_api.Services
             var categorias = await _context.Categorias.ToListAsync();
             return categorias;
         }
-        public async Task<IEnumerable<Object>> GetProyectos()
+        public async Task<Object> GetProyectos()
         {
+            Response res = new Response();
             var proyectos = await _context.Proyectos
                 .Include(p => p.Categoria)
                 .Include(p => p.UnidadDeNegocio)
@@ -38,7 +39,10 @@ namespace jr_api.Services
 
             if (proyectos == null || !proyectos.Any())
             {
-                return new List<object>(); // Retorna una lista vacía en lugar de null
+                res.Code = 500;
+                res.Message = "Proyecto no encontrado";
+                res.data = "";
+                return res;
             }
 
             var result = proyectos.Select(p => new
@@ -53,11 +57,15 @@ namespace jr_api.Services
                 p.Estado,
                 Estatus = p.EstatusProyecto?.Nombre ?? "Sin estatus",
             }).ToList();
-
-            return result;
+            res.Code = 200;
+            res.Message = "Proyecto no encontrado";
+            res.data = "";
+            return res;
         }
         public async Task<Object> GetProyectoById(int id)
         {
+
+            Response res = new Response();
             // Buscar el proyecto por su ID
             var proyecto = await _context.Proyectos
                 .Where(p => p.ProyectoId == id)
@@ -129,7 +137,10 @@ namespace jr_api.Services
             // Verificar si el proyecto existe
             if (proyecto == null)
             {
-                return null;
+                res.Code = 500;
+                res.Message = "Proyecto no encontrado";
+                res.data = "";
+                return res;
             }
 
             return proyecto;
@@ -320,11 +331,21 @@ namespace jr_api.Services
         public async Task<Object> SubirArchivo( int proyectoId, string categoria,  IFormFile archivo)
         {
             Response res = new Response();
-
+            if (archivo == null || archivo.Length == 0)
+            {
+                res.Code = 500;
+                res.Message = "Archivo no proporcionado";
+                res.data = "";
+                return res;
+            }
             var proyecto = await _context.Proyectos.FindAsync(proyectoId);
             if (proyecto == null)
-                return null;
-
+            {
+                res.Code = 500;
+                res.Message = "proyecto no encontrado";
+                res.data = "";
+                return res;
+            }
             try
             {
                 // ✅ Leer la ruta base desde appsettings.json
@@ -445,13 +466,21 @@ namespace jr_api.Services
                 {
                     System.IO.File.Delete(filePath);
                 }
+                else {
+                    res.Code = 500;
+                    res.Message = "no existe el archivo";
+                    res.data = "";
+                    return res;
+                }
 
-                // Buscar el archivo en la base de datos
-                var archivoBD = await _context.ProyectoArchivo
-                    .FirstOrDefaultAsync(a =>
-                        a.ProyectoId == proyectoId &&
-                        a.Categoria == categoria &&
-                        a.NombreArchivo == nombreArchivo);
+
+
+                    // Buscar el archivo en la base de datos
+                    var archivoBD = await _context.ProyectoArchivo
+                        .FirstOrDefaultAsync(a =>
+                            a.ProyectoId == proyectoId &&
+                            a.Categoria == categoria &&
+                            a.NombreArchivo == nombreArchivo);
 
                 // Eliminar registro de la tabla si existe
                 if (archivoBD != null)
@@ -463,7 +492,13 @@ namespace jr_api.Services
                     res.data = "";
 
                 }
-                return res;
+                else
+                {
+                    res.Code = 500;
+                    res.Message = "No se encontro el registro en la base de datos";
+                    res.data = "";
+                }
+                    return res;
             }
             catch (Exception ex)
             {

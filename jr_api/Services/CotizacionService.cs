@@ -81,7 +81,13 @@ namespace jr_api.Services
             {
                 var cotizacion = await _context.Cotizaciones.FindAsync(id);
                 if (cotizacion == null)
-                    return null;
+                {
+                    res.Code = 500;
+                    res.Message = "Cotizacion no existe";
+                    res.data = "";
+                    return res;
+                }
+                    
 
                 res.Code = 200;
                 res.Message = "";
@@ -152,8 +158,12 @@ namespace jr_api.Services
                         .FirstOrDefaultAsync(c => c.CotizacionId == cotizacionDto.CotizacionId);
 
                     if (cotizacion == null)
-                        return null;
-
+                    {
+                        res.Code = 500;
+                        res.Message = "Cotizacion no existe";
+                        res.data = "";
+                        return res;
+                    }
                     var estatusAnterior = cotizacion.Estatus;
                     var estatusNuevo = cotizacionDto.Estatus;
 
@@ -235,7 +245,10 @@ namespace jr_api.Services
             {
                 var cotizacion = await _context.Cotizaciones.FindAsync(id);
                 if (cotizacion == null)
-                    return null;
+                    res.Code = 500;
+                res.Message = "Cotizacion no existe";
+                res.data = "";
+                return res;
                 cotizacion.Active = false;
                 _context.Cotizaciones.Update(cotizacion);
                 await _context.SaveChangesAsync();

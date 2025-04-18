@@ -49,10 +49,7 @@ public class CotizacionController : ControllerBase
             return BadRequest("Datos inválidos.");
         var cotizacion = await _CotizacionService.SaveCotizacion(cotizacionDto);
 
-        if (cotizacion == null)
-                return NotFound("Cotización no encontrada.");
-
-        return Ok(new { Message = "Cotización guardada correctamente", CotizacionId = cotizacion });
+        return Ok(cotizacion);
     }
 
     // Eliminar una cotización
@@ -60,9 +57,7 @@ public class CotizacionController : ControllerBase
     public async Task<IActionResult> DeleteCotizacion(int id)
     {
         var cotizacion = await _CotizacionService.DeleteCotizacion(id);
-        if (cotizacion == null)
-            return NotFound("Cotización no encontrada.");
-        return Ok(new { Message = "Cotización eliminada correctamente" });
+        return Ok(cotizacion);
     }
     [HttpGet("estatus")]
     public async Task<ActionResult<IEnumerable<EstatusCotizacion>>> GetEstatusCotizaciones()
