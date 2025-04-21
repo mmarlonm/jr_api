@@ -1,4 +1,5 @@
-﻿using jr_api.IServices;
+﻿using jr_api.DTOs;
+using jr_api.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -33,21 +34,26 @@ namespace jr_api.Services
               
             return prospecto;
         }
-        public async Task<int?> SaveProspecto( Prospecto request)
+        public async Task<object> SaveProspecto( Prospecto request)
         {
-
+            ResponseDTO res = new ResponseDTO();
             try
             {
                 if (request.ProspectoId == 0)
                 {
                     request.FechaRegistro = DateTime.UtcNow;
+                    request.Active = true;
                     _context.Prospectos.Add(request);
                 }
                 else
                 {
                     var existing = await _context.Prospectos.FindAsync(request.ProspectoId);
                     if (existing == null)
-                        return null;
+                    {
+                        res.Code = 500;
+                        res.Message = "Prospecto no encontrado";
+                        return res;
+                    }
 
                     existing.Empresa = request.Empresa;
                     existing.Contacto = request.Contacto;
@@ -62,14 +68,19 @@ namespace jr_api.Services
                     existing.Otros = request.Otros;
                     existing.PersonalSeguimiento = request.PersonalSeguimiento;
 
-
                     _context.Prospectos.Update(existing);
-                    await _context.SaveChangesAsync();
+                    
                 }
-                return request.ProspectoId;
+                await _context.SaveChangesAsync();
+                res.Code = 200;
+                res.Message = "Prospecto guardado exitosamente";
+                res.data = request.ProspectoId;
+                return res;
             }catch(Exception e)
             {
-                return null;
+                res.Code = 500;
+                res.Message = "Error al guardar prospecto "+ e.Message;
+                return res;
             }
         }
         public async Task<Object> DeleteProspecto(int id)

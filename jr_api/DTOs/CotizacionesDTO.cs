@@ -11,7 +11,7 @@ public class CotizacionesDTO
     public int? UsuarioCreadorId { get; set; }
     public string? Necesidad { get; set; }
     public string? Direccion { get; set; }
-    public string? NombreContacto { get; set; }
+    public string NombreContacto { get; set; }
     public string? Telefono { get; set; }
     public string? Empresa { get; set; }
 

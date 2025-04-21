@@ -5,11 +5,11 @@ public class Venta
 {
     public int VentaId { get; set; }
     public DateTime Fecha { get; set; }
-    public string Serie { get; set; }
-    public string Folio { get; set; }
-    public decimal Total { get; set; }
-    public decimal Pendiente { get; set; }
-    public Guid UUID { get; set; }
+    public string? Serie { get; set; }
+    public string? Folio { get; set; }
+    public decimal? Total { get; set; }
+    public decimal? Pendiente { get; set; }
+    public Guid? UUID { get; set; }
 
     public int? FacturadorExternoId { get; set; }
     public string? Observaciones { get; set; }

@@ -145,7 +145,7 @@ namespace jr_api.Services
                         MontoTotal = cotizacionDto.MontoTotal,
                         AjustesCostos = cotizacionDto.AjustesCostos,
                         Comentarios = cotizacionDto.Comentarios,
-                        Active =false
+                        Active =true
                     };
 
                     _context.Cotizaciones.Add(cotizacion);
@@ -214,7 +214,7 @@ namespace jr_api.Services
                         MontoTotal = cotizacionDto.MontoTotal,
                         AjustesCostos = cotizacionDto.AjustesCostos,
                         Comentarios = cotizacionDto.Comentarios,
-                        Active = false
+                        Active = true
                     };
 
                     _context.Cotizaciones.Update(cotizacion);

@@ -6,7 +6,7 @@ namespace jr_api.IServices
 	{
         Task<IEnumerable<object>> GetAllProspectos();
         Task<object> GetProspectoById(int id);
-        Task<int?> SaveProspecto(Prospecto request);
+        Task<Object> SaveProspecto(Prospecto request);
         Task<Object> DeleteProspecto(int id);
         Task<Object> GetSeguimientos(int prospectoId);
         Task<Object> GetNotasByProspecto(int prospectoId);

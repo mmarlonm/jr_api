@@ -53,11 +53,9 @@ public class ProspectoController : ControllerBase
         if (request == null)
             return BadRequest("Datos inválidos.");
         var prospecto = await _ProspectoService.SaveProspecto(request);
-        if (prospecto == null)
-            return BadRequest("El prospecto no existe");
 
 
-        return Ok(new { message = "Prospecto guardado correctamente." });
+        return Ok(prospecto);
     }
 
     // 🔸 Eliminar prospecto (eliminación física, puedes hacer lógica si prefieres)
