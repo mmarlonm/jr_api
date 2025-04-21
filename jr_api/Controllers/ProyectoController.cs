@@ -45,8 +45,6 @@ public class ProyectoController : ControllerBase
     [HttpGet("proyectos")]
     public async Task<IActionResult> GetProyectos()
     {
-   
-   
         var result = await _ProyectoService.GetProyectos();
 
         return Ok(result);

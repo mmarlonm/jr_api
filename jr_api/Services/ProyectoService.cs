@@ -1,4 +1,5 @@
-﻿using jr_api.IServices;
+﻿using jr_api.DTOs;
+using jr_api.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.Formula.Functions;
@@ -30,7 +31,7 @@ namespace jr_api.Services
         }
         public async Task<Object> GetProyectos()
         {
-            Response res = new Response();
+            ResponseDTO res = new ResponseDTO();
             var proyectos = await _context.Proyectos
                 .Include(p => p.Categoria)
                 .Include(p => p.UnidadDeNegocio)
@@ -57,11 +58,13 @@ namespace jr_api.Services
                 p.Estado,
                 Estatus = p.EstatusProyecto?.Nombre ?? "Sin estatus",
             }).ToList();
+
             res.Code = 200;
-            res.Message = "Proyecto no encontrado";
-            res.data = "";
+            res.Message = "";
+            res.data = result;
             return res;
         }
+
         public async Task<Object> GetProyectoById(int id)
         {
 
