@@ -76,23 +76,9 @@ public class ProyectoController : ControllerBase
     [HttpDelete("eliminar-proyecto/{id}")]
     public async Task<IActionResult> DeleteProyecto(int id)
     {
-        var proyecto = await _context.Proyectos.FindAsync(id);
-        if (proyecto == null)
-        {
-            return NotFound("El proyecto no se encontró.");
-        }
-
-        // Eliminar las relaciones asociadas, si es necesario
-        var rolVistas = await _context.RolVistas.Where(rv => rv.VistaId == id).ToListAsync();
-        _context.RolVistas.RemoveRange(rolVistas);
-
-        var rolPermisos = await _context.RolPermisos.Where(rp => rp.VistaId == id).ToListAsync();
-        _context.RolPermisos.RemoveRange(rolPermisos);
-
-        _context.Proyectos.Remove(proyecto);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { Message = "Proyecto eliminado correctamente." });
+        var res= await _ProyectoService.DeleteProyecto(id);
+       
+        return Ok(res);
     }
 
 

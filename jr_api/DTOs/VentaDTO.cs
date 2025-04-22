@@ -12,4 +12,5 @@
     public int UsuarioId { get; set; }
     public int FormaPagoId { get; set; }  // Cambié el nombre de 'FormasDePagoId' a 'FormaPagoId'
     public int UnidadNegocioId { get; set; }
+    public int? ProyectoId { get; set; }
 }

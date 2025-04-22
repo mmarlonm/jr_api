@@ -30,5 +30,6 @@ public class Venta
     public UnidadDeNegocio UnidadDeNegocio { get; set; }
     public DateTime FechaRegistro { get; set; }
     public bool Active { get; set; }
+    public int? proyectoId { get; set; }
 
 }
