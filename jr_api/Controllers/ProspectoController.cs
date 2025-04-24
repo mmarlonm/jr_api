@@ -39,10 +39,6 @@ public class ProspectoController : ControllerBase
     public async Task<IActionResult> GetProspectoById(int id)
     {
         var prospecto = await _ProspectoService.GetProspectoById(id);
-       if (prospecto == null)
-        {
-            return NotFound("No existe prospecto");
-        }
         return Ok(prospecto);
     }
 
@@ -63,11 +59,6 @@ public class ProspectoController : ControllerBase
     public async Task<IActionResult> DeleteProspecto(int id)
     {
         var prospecto = await _ProspectoService.DeleteProspecto(id);
-        if (prospecto == null)
-        {
-            return NotFound("Prospecto no encontrado.");
-
-        }
         return Ok(prospecto);
     }
 

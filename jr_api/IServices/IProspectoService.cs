@@ -4,7 +4,7 @@ namespace jr_api.IServices
 {
 	public interface IProspectoService
 	{
-        Task<IEnumerable<object>> GetAllProspectos();
+        Task<object> GetAllProspectos();
         Task<object> GetProspectoById(int id);
         Task<Object> SaveProspecto(Prospecto request);
         Task<Object> DeleteProspecto(int id);

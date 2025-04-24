@@ -1,7 +1,9 @@
-﻿using jr_api.DTOs;
+﻿using Azure.Core;
+using jr_api.DTOs;
 using jr_api.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Data;
 namespace jr_api.Services
 {
@@ -13,26 +15,63 @@ namespace jr_api.Services
         {
             _context = context;
         }
-        public async Task<IEnumerable<object>> GetAllProspectos()
+        public async Task<object> GetAllProspectos()
         {
-
+            ResponseDTO res = new ResponseDTO();
             var prospectos = await _context.Prospectos
                 .Where(P => P.Active)
                 .ToListAsync();
+            try
+            {
+                if (prospectos == null)
+                {
+                    res.Code = 500;
+                    res.Message = "Prospecto no encontrado";
+                    return res;
+                }
+                res.Code = 200;
+                res.Message = "";
+                res.data = prospectos;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Code = 500;
+                res.Message = "Error al encontrar prospecto " + ex;
+                res.data = "";
+                return res;
 
-
-
-            return prospectos;
+            }
+            
         }
         public async Task<object> GetProspectoById(int id)
         {
-            var prospecto = await _context.Prospectos
-                .FirstOrDefaultAsync(p => p.ProspectoId == id);
+            ResponseDTO res = new ResponseDTO();
+            try
+            {
 
-            if (prospecto == null)
-                return null;
-              
-            return prospecto;
+                var prospecto = await _context.Prospectos
+                    .FirstOrDefaultAsync(p => p.ProspectoId == id);
+
+                if (prospecto == null)
+                {
+                    res.Code = 500;
+                    res.Message = "Prospecto no encontrado";
+                    return res;
+                }
+                res.Code = 200;
+                res.Message = "";
+                res.data = prospecto;
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                res.Code = 500;
+                res.Message = "Error al encontrar prospecto " + ex;
+                res.data = "";
+                return res;
+            }
         }
         public async Task<object> SaveProspecto( Prospecto request)
         {
@@ -85,15 +124,31 @@ namespace jr_api.Services
         }
         public async Task<Object> DeleteProspecto(int id)
         {
+            ResponseDTO res = new ResponseDTO();
             var prospecto = await _context.Prospectos.FindAsync(id);
-            if (prospecto == null)
-                return null;
-            prospecto.Active = false;
-            _context.Prospectos.Update(prospecto);
-
-            await _context.SaveChangesAsync();
-
-            return prospecto;
+            try
+            {
+                if (prospecto == null) 
+                 {
+                    res.Code = 500;
+                    res.Message = "Prospecto no encontrado";
+                    return res;
+                }
+                await _context.SaveChangesAsync();
+                prospecto.Active = false;
+                _context.Prospectos.Update(prospecto);
+                res.Code = 200;
+                res.Message = "";
+                res.data = prospecto;
+                return res;
+                }
+            catch(Exception ex)
+            {
+                res.Code = 500;
+                res.Message = "Error al encontrar prospecto " + ex;
+                res.data = "";
+                return res;
+            }
         }
         public async Task<Object> GetSeguimientos(int prospectoId)
         {
