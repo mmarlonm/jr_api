@@ -1,8 +1,8 @@
 ﻿public interface IVentaService
 {
-    Task<List<VentaParametrosDto>> ObtenerVentasAsync();
-    Task<VentaDto?> ObtenerVentaPorIdAsync(int id);
-    Task<VentaDto> GuardarVentaAsync(VentaDto dto);
-    Task<bool> EliminarVentaAsync(int id);
+    Task<Object> ObtenerVentasAsync();
+    Task<Object> ObtenerVentaPorIdAsync(int id);
+    Task<Object> GuardarVentaAsync(VentaDto dto);
+    Task<Object> EliminarVentaAsync(int id);
     Task<List<FormaDePagoDto>> ObtenerFormasDePagoAsync();
 }

@@ -29,14 +29,14 @@ public class VentaController : ControllerBase
     public async Task<IActionResult> Create([FromBody] VentaDto dto)
     {
         var venta = await _ventaService.GuardarVentaAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = venta.VentaId }, venta);
+        return CreatedAtAction(nameof(GetById), new { id = venta }, venta);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _ventaService.EliminarVentaAsync(id);
-        return result ? NoContent() : NotFound();
+        return Ok(result);
     }
 
     // Obtener formas de pago

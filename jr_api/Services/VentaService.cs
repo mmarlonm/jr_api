@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using jr_api.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 public class VentaService : IVentaService
 {
@@ -9,140 +10,211 @@ public class VentaService : IVentaService
         _context = context;
     }
 
-    public async Task<List<VentaParametrosDto>> ObtenerVentasAsync()
+    public async Task<Object> ObtenerVentasAsync()
     {
-
-        return await _context.Ventas
-             .Where(V => V.Active)
-
-            .Include(v => v.Cliente)
-            .Include(v => v.Agente)  // Cambio de Usuario a Agente
-            .Include(v => v.UnidadDeNegocio)
-            .Include(v => v.FormaPago)
-            .Select(v => new VentaParametrosDto
-            {
-                VentaId = v.VentaId,
-                Fecha = v.Fecha,
-                Serie = v.Serie,
-                Folio = v.Folio,
-                ClienteId = v.ClienteId,
-                ClienteNombre = v.Cliente.Nombre,  // Asegúrate de que "Cliente" tiene la propiedad "Nombre"
-                Total = v.Total,
-                Pendiente = v.Pendiente,
-                UsuarioId = v.AgenteId,  // Cambio de UsuarioId a AgenteId
-                UsuarioNombre = v.Agente.NombreUsuario,  // Cambio de Usuario a Agente
-                FormaPagoId = v.FormaPagoId,
-                FormaDePagoDescripcion = v.FormaPago.Descripcion,
-                UUID = v.UUID,
-                UnidadDeNegocioId = v.UnidadDeNegocioId,
-                UnidadDeNegocioNombre = v.UnidadDeNegocio.Nombre
-            })
-            .ToListAsync();
-    }
-
-    public async Task<VentaDto?> ObtenerVentaPorIdAsync(int id)
-    {
-        return await _context.Ventas
-            .Include(v => v.Cliente)
-            .Include(v => v.Agente)  // Cambio de Usuario a Agente
-            .Include(v => v.UnidadDeNegocio)
-            .Include(v => v.FormaPago)
-            .Where(v => v.VentaId == id)
-            .Select(v => new VentaDto
-            {
-                VentaId = v.VentaId,
-                Fecha = v.Fecha,
-                Serie = v.Serie,
-                Folio = v.Folio,
-                ClienteId = v.ClienteId,
-                Total = v.Total,
-                Pendiente = v.Pendiente,
-                UUID = v.UUID,
-                UsuarioId = v.AgenteId,
-                FormaPagoId = v.FormaPagoId,
-                UnidadNegocioId = v.UnidadDeNegocioId,
-            })
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<VentaDto> GuardarVentaAsync(VentaDto dto)
-    {
-        // Validar datos obligatorios
-        if (dto.Fecha == default || string.IsNullOrEmpty(dto.Serie) || string.IsNullOrEmpty(dto.Folio))
-        {
-            throw new ArgumentException("Faltan valores obligatorios");
-        }
-
-        Venta venta;
-
-        // Verificar si estamos actualizando una venta existente o creando una nueva
-        if (dto.VentaId > 0)
-        {
-            // Actualizar
-            venta = await _context.Ventas.FindAsync(dto.VentaId);
-
-            if (venta == null)
-            {
-                throw new ArgumentException("Venta no encontrada para actualizar");
-            }
-
-            // Actualizar los campos de la venta
-            venta.Fecha = dto.Fecha;
-            venta.Serie = dto.Serie;
-            venta.Folio = dto.Folio;
-            venta.ClienteId = dto.ClienteId;
-            venta.Total = dto.Total;
-            venta.Pendiente = dto.Pendiente;
-            venta.AgenteId = dto.UsuarioId; // Asegúrate de que UsuarioId está presente y es válido
-            venta.FormaPagoId = dto.FormaPagoId;
-            venta.UUID = dto.UUID;
-            venta.UnidadDeNegocioId = dto.UnidadNegocioId;
-        }
-        else
-        {
-            // Crear nueva venta
-            venta = new Venta
-            {
-                Fecha = dto.Fecha,
-                Serie = dto.Serie,
-                Folio = dto.Folio,
-                ClienteId = dto.ClienteId,
-                Total = dto.Total,
-                Pendiente = dto.Pendiente,
-                AgenteId = dto.UsuarioId, // Asegúrate de que UsuarioId está presente y es válido
-                FormaPagoId = dto.FormaPagoId,
-                UUID = dto.UUID,
-                UnidadDeNegocioId = dto.UnidadNegocioId,
-                FechaRegistro = DateTime.Now // Si falta este valor, lo puedes agregar aquí
-            };
-
-            _context.Ventas.Add(venta);
-        }
-
+        ResponseDTO res = new ResponseDTO();
         try
         {
-            // Guardar los cambios en la base de datos
-            await _context.SaveChangesAsync();
+            var ventas = await _context.Ventas
+
+                     .Where(V => V.Active)
+
+                    .Include(v => v.Cliente)
+                    .Include(v => v.Agente)  // Cambio de Usuario a Agente
+                    .Include(v => v.UnidadDeNegocio)
+                    .Include(v => v.FormaPago)
+
+                    .Select(v => new VentaParametrosDto
+                    {
+                        VentaId = v.VentaId,
+                        Fecha = v.Fecha,
+                        Serie = v.Serie,
+                        Folio = v.Folio,
+                        ClienteId = v.ClienteId,
+                        ClienteNombre = v.Cliente.Nombre,  // Asegúrate de que "Cliente" tiene la propiedad "Nombre"
+                        Total = v.Total,
+                        Pendiente = v.Pendiente,
+                        UsuarioId = v.AgenteId,  // Cambio de UsuarioId a AgenteId
+                        UsuarioNombre = v.Agente.NombreUsuario,  // Cambio de Usuario a Agente
+                        FormaPagoId = v.FormaPagoId,
+                        FormaDePagoDescripcion = v.FormaPago.Descripcion,
+                        UUID = v.UUID,
+                        UnidadDeNegocioId = v.UnidadDeNegocioId,
+                        UnidadDeNegocioNombre = v.UnidadDeNegocio.Nombre
+                    }).ToListAsync();
+            if (ventas == null)
+            {
+                res.Code = 500;
+                res.Message = "Ventas no encontrada";
+                return res;
+            }
+            res.Code = 200;
+            res.Message = "";
+            res.data = ventas;
+            return res;
         }
         catch (Exception ex)
         {
-            // Log o manejo del error
-            throw new Exception("Error al guardar o actualizar la venta", ex);
+            res.Code = 500;
+            res.Message = "Error al mostrar ventas " + ex.Message;
+            return res;
         }
-
-        // Asignar el VentaId a DTO para retornar
-        dto.VentaId = venta.VentaId;
-        return dto;
     }
 
-    public async Task<bool> EliminarVentaAsync(int id)
+    public async Task<Object> ObtenerVentaPorIdAsync(int id)
     {
-        var venta = await _context.Ventas.FindAsync(id);
-        if (venta == null) return false;
-        venta.Active = false;
-        _context.Ventas.Update(venta);
-        await _context.SaveChangesAsync();
-        return true;
+        ResponseDTO res = new ResponseDTO();
+        try
+        {
+            var venta = await _context.Ventas
+                 .Include(v => v.Cliente)
+                 .Include(v => v.Agente)  // Cambio de Usuario a Agente
+                 .Include(v => v.UnidadDeNegocio)
+                 .Include(v => v.FormaPago)
+                 .Where(v => v.VentaId == id)
+                 .Select(v => new VentaDto
+                 {
+                     VentaId = v.VentaId,
+                     Fecha = v.Fecha,
+                     Serie = v.Serie,
+                     Folio = v.Folio,
+                     ClienteId = v.ClienteId,
+                     Total = v.Total,
+                     Pendiente = v.Pendiente,
+                     UUID = v.UUID,
+                     UsuarioId = v.AgenteId,
+                     FormaPagoId = v.FormaPagoId,
+                     UnidadNegocioId = v.UnidadDeNegocioId,
+                 })
+                 .FirstOrDefaultAsync();
+            if (venta == null)
+            {
+                res.Code = 500;
+                res.Message = "Venta no encontrada";
+                return res;
+            }
+           res .Code = 200;
+            res.Message = "";
+            res.data = venta;
+            return res;
+        }
+        catch(Exception ex)
+        {
+            res.Code = 500;
+            res.Message = "Error al mostrar venta " + ex.Message;
+            return res;
+        }
+
+    }
+
+    public async Task<Object> GuardarVentaAsync(VentaDto dto)
+    {
+        ResponseDTO res = new ResponseDTO();
+       
+            // Validar datos obligatorios
+            if (dto.Fecha == default || string.IsNullOrEmpty(dto.Serie) || string.IsNullOrEmpty(dto.Folio))
+            {
+                res.Code = 404;
+                res.Message = "Faltan valores obligatorios";
+                return res;
+            }
+
+            Venta venta;
+
+        try
+        {
+            // Verificar si estamos actualizando una venta existente o creando una nueva
+            if (dto.VentaId > 0)
+            {
+                // Actualizar
+                venta = await _context.Ventas.FindAsync(dto.VentaId);
+
+                if (venta == null)
+                {
+                    res.Code = 500;
+                    res.Message = "Venta no encontrado";
+                    return res;
+                }
+
+                // Actualizar los campos de la venta
+                venta.Fecha = dto.Fecha;
+                venta.Serie = dto.Serie;
+                venta.Folio = dto.Folio;
+                venta.ClienteId = dto.ClienteId;
+                venta.Total = dto.Total;
+                venta.Pendiente = dto.Pendiente;
+                venta.AgenteId = dto.UsuarioId; // Asegúrate de que UsuarioId está presente y es válido
+                venta.FormaPagoId = dto.FormaPagoId;
+                venta.UUID = dto.UUID;
+                venta.UnidadDeNegocioId = dto.UnidadNegocioId;
+                venta.Active = true;
+            }
+            else
+            {
+                // Crear nueva venta
+                venta = new Venta
+                {
+                    Fecha = dto.Fecha,
+                    Serie = dto.Serie,
+                    Folio = dto.Folio,
+                    ClienteId = dto.ClienteId,
+                    Total = dto.Total,
+                    Pendiente = dto.Pendiente,
+                    AgenteId = dto.UsuarioId, // Asegúrate de que UsuarioId está presente y es válido
+                    FormaPagoId = dto.FormaPagoId,
+                    UUID = dto.UUID,
+                    UnidadDeNegocioId = dto.UnidadNegocioId,
+                    FechaRegistro = DateTime.Now, // Si falta este valor, lo puedes agregar aquí
+                   Active = true
+                };
+
+                _context.Ventas.Add(venta);
+            }
+                // Guardar los cambios en la base de datos
+            await _context.SaveChangesAsync();
+        
+        }
+            catch (Exception ex)
+            {
+            res.Code = 500;
+            res.Message = "Error al guardar o actualizar venta venta " + ex.Message;
+            return res;
+            }
+
+            // Asignar el VentaId a DTO para retornar
+            dto.VentaId = venta.VentaId;
+        res.Code = 200;
+        res.Message = "venta guardado exitosamente";
+        return res;
+       
+    }
+
+    public async Task<Object> EliminarVentaAsync(int id)
+    {
+        ResponseDTO res = new ResponseDTO();
+        try
+        {
+            var venta = await _context.Ventas.FindAsync(id);
+            if (venta == null)
+            {
+                res.Code = 500;
+                res.Message = "Venta no encontrado";
+                return res;
+            }
+            venta.Active = false;
+            _context.Ventas.Update(venta);
+            await _context.SaveChangesAsync();
+            res.Code = 200;
+            res.Message = "";
+            return res;
+        }
+        catch
+        {
+            res.Code = 500;
+            res.Message = "Error al eliminar venta ";
+            return res;
+
+        }
     }
 
     public async Task<List<FormaDePagoDto>> ObtenerFormasDePagoAsync()
