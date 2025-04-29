@@ -305,11 +305,13 @@ namespace jr_api.Services
                             UsuarioCambio = "Sistema"
                         };
                         _context.ProyectoEstatusHistorial.Add(historial);
+
                     }
+                    _context.Proyectos.Update(proyecto);
                 }
 
                 
-                _context.Proyectos.Update(proyecto);
+                
 
                 await _context.SaveChangesAsync();
 

@@ -244,11 +244,12 @@ namespace jr_api.Services
             try
             {
                 var cotizacion = await _context.Cotizaciones.FindAsync(id);
-                if (cotizacion == null)
-                    res.Code = 500;
+                if (cotizacion == null) { 
+                res.Code = 500;
                 res.Message = "Cotizacion no existe";
                 res.data = "";
                 return res;
+            }
                 cotizacion.Active = false;
                 _context.Cotizaciones.Update(cotizacion);
                 await _context.SaveChangesAsync();

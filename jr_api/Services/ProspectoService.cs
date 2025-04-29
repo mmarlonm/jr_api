@@ -134,9 +134,12 @@ namespace jr_api.Services
                     res.Message = "Prospecto no encontrado";
                     return res;
                 }
-                await _context.SaveChangesAsync();
+                
                 prospecto.Active = false;
                 _context.Prospectos.Update(prospecto);
+
+                await _context.SaveChangesAsync();
+
                 res.Code = 200;
                 res.Message = "";
                 res.data = prospecto;
