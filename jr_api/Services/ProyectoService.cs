@@ -37,6 +37,7 @@ namespace jr_api.Services
                 .Include(p => p.Categoria)
                 .Include(p => p.UnidadDeNegocio)
                 .Include(p => p.EstatusProyecto)
+                .Where(p => p.Active)
                 .ToListAsync();
 
             if (proyectos == null || !proyectos.Any())
@@ -351,8 +352,8 @@ namespace jr_api.Services
                 var ventas = await _context.Ventas.Where(rp => rp.proyectoId == id).ToListAsync();
                 _context.Ventas.RemoveRange(ventas);
 
-
-                _context.Proyectos.Remove(proyecto);
+                proyecto.Active = false;
+                _context.Proyectos.Update(proyecto);
 
                 await _context.SaveChangesAsync();
                 res.Code = 200;

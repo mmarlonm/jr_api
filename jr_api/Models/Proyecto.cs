@@ -118,7 +118,8 @@ public class Proyecto
 
     // Relación inversa al Usuario
     public Usuario UsuarioCreador { get; set; }
-
+    public bool Active { get; set; }
     //relacion historial de estatus
     public ICollection<ProyectoEstatusHistorial> EstatusHistorial { get; set; }
+   
 }
