@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
+﻿using System.Text;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,9 @@ using jr_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agrega servicios para Swagger
-builder.Services.AddEndpointsApiExplorer();
+// ----------------------------- Servicios -----------------------------
+
+// Agregar servicios personalizados
 builder.Services.AddScoped<IAnaliticaService, AnaliticaService>();
 builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
@@ -22,8 +24,67 @@ builder.Services.AddScoped<IProspectoService, ProspectoService>();
 builder.Services.AddScoped<IVentaService, VentaService>();
 builder.Services.AddScoped<IProyectoService, ProyectoService>();
 builder.Services.AddScoped<ICotizacionService, CotizacionService>();
+builder.Services.AddHostedService<InactivityChecker>();
 
+// Configuración de la base de datos
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// SignalR
+builder.Services.AddSignalR();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200", "https://mmarlonm.github.io")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+// JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var path = context.HttpContext.Request.Path;
+                var accessToken = context.Request.Query["access_token"];
+
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -33,7 +94,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "API con autenticación JWT",
     });
 
-    // Soporte para autenticación JWT en Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -55,94 +115,35 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 
-    // Soporte para `IFormFile` en Swagger
     options.OperationFilter<SwaggerFileOperationFilter>();
 });
-// Configura la conexión a la base de datos
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configura CORS para permitir solicitudes desde cualquier dominio
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:4200", "https://mmarlonm.github.io") // TU frontend
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // Requerido para JWT con SignalR
-    });
-});
-
-// Configura JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-
-        // Permitir token en la query string para SignalR
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
-            {
-                var accessToken = context.Request.Query["access_token"];
-
-                // Verifica que sea una conexión a SignalR
-                var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/chatHub"))
-                {
-                    context.Token = accessToken;
-                }
-
-                return Task.CompletedTask;
-            }
-        };
-    });
-
-
-builder.Services.AddControllers();
-
-//hubs para chat
-builder.Services.AddSignalR();
-
-
+// ----------------------------- App -----------------------------
 
 var app = builder.Build();
-// Usa CORS
+
 app.UseCors("CorsPolicy");
-
-//config chat real time
-app.MapHub<ChatHub>("/chatHub");
-
-//app.UseSwagger();
-//app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-//app.Urls.Add("http://0.0.0.0:8080");
+
+app.MapHub<ChatHub>("/chatHub");
+app.MapHub<PresenceHub>("/presenceHub");
+
+// Descomenta esto si deseas habilitar Swagger en producción/desarrollo
+ app.UseSwagger();
+ app.UseSwaggerUI();
 
 app.Run();
 
+// -------------------------- Swagger Helper ---------------------------
 
-// Filtro para manejar archivos en Swagger
 public class SwaggerFileOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)

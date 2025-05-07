@@ -85,6 +85,7 @@ public class VentaService : IVentaService
                      UsuarioId = v.AgenteId,
                      FormaPagoId = v.FormaPagoId,
                      UnidadNegocioId = v.UnidadDeNegocioId,
+                     ProyectoId = v.proyectoId
                  })
                  .FirstOrDefaultAsync();
             if (venta == null)
@@ -147,6 +148,7 @@ public class VentaService : IVentaService
                 venta.FormaPagoId = dto.FormaPagoId;
                 venta.UUID = dto.UUID;
                 venta.UnidadDeNegocioId = dto.UnidadNegocioId;
+                venta.proyectoId = dto.ProyectoId;
                 venta.Active = true;
             }
             else
@@ -165,6 +167,7 @@ public class VentaService : IVentaService
                     UUID = dto.UUID,
                     UnidadDeNegocioId = dto.UnidadNegocioId,
                     FechaRegistro = DateTime.Now, // Si falta este valor, lo puedes agregar aquí
+                    proyectoId = dto.ProyectoId,
                    Active = true
                 };
 

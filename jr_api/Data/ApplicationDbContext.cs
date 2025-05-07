@@ -31,6 +31,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<CotizacionArchivo> CotizacionArchivo { get; set; }
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Mensaje> Mensajes { get; set; }
+    public DbSet<LoginLogs> LoginLogs { get; set; }
 
     //tablas venta
     public DbSet<Venta> Ventas { get; set; }
