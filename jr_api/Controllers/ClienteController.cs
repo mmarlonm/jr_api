@@ -72,7 +72,8 @@ namespace TuProyecto.Api.Controllers
                     Empresa = request.Empresa,
                     RFC = request.RFC,
                     Activo = true,
-                    FechaRegistro = DateTime.UtcNow
+                    FechaRegistro = DateTime.UtcNow,
+                    Calificacion = request.Calificacion
                 };
 
                 _context.Clientes.Add(cliente);
@@ -98,6 +99,7 @@ namespace TuProyecto.Api.Controllers
                 cliente.Empresa = request.Empresa;
                 cliente.RFC = request.RFC;
                 cliente.Activo = request.Activo;
+                cliente.Calificacion = request.Calificacion;
             }
 
             await _context.SaveChangesAsync();
@@ -194,5 +196,6 @@ namespace TuProyecto.Api.Controllers
         public string? Empresa { get; set; }
         public string? RFC { get; set; }
         public bool Activo { get; set; }
+        public int? Calificacion { get; set; }
     }
 }

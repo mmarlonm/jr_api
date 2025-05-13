@@ -47,4 +47,5 @@ public class Cliente
     public DateTime FechaRegistro { get; set; } = DateTime.UtcNow;
 
     public bool Activo { get; set; } = true;
+    public int? Calificacion { get; set; }
 }
