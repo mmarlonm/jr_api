@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 public class PresenceHub : Hub
 {
     private static readonly ConcurrentDictionary<string, UserConnection> _connections = new();
+    public static IReadOnlyDictionary<string, UserConnection> Connections => _connections;
 
     public override async Task OnConnectedAsync()
     {
@@ -18,8 +19,9 @@ public class PresenceHub : Hub
             LastHeartbeat = DateTime.UtcNow
         };
 
-        await Clients.All.SendAsync("UserConnected", userId); // 🚀 Notifica que un usuario se conectó
-        await Clients.All.SendAsync("ConnectedUsersUpdated", GetConnectedUserIds());
+        await Clients.All.SendAsync("UserConnected", userId);
+        await Clients.All.SendAsync("ConnectedUsersUpdated", GetConnectedUsersWithStatus());
+
         await base.OnConnectedAsync();
     }
 
@@ -27,8 +29,8 @@ public class PresenceHub : Hub
     {
         if (_connections.TryRemove(Context.ConnectionId, out var removed))
         {
-            await Clients.All.SendAsync("UserDisconnected", removed.UserId); // 🚪 Notifica que se desconectó
-            await Clients.All.SendAsync("ConnectedUsersUpdated", GetConnectedUserIds());
+            await Clients.All.SendAsync("UserDisconnected", removed.UserId);
+            await Clients.All.SendAsync("ConnectedUsersUpdated", GetConnectedUsersWithStatus());
         }
 
         await base.OnDisconnectedAsync(exception);
@@ -43,9 +45,39 @@ public class PresenceHub : Hub
         return Task.CompletedTask;
     }
 
-    public static List<string> GetConnectedUserIds()
+    public async Task SetAway(string usuarioId)
     {
-        return _connections.Values.Select(u => u.UserId).Distinct().ToList();
+        Console.WriteLine($"⏳ Usuario inactivo: {usuarioId}");
+        await Clients.All.SendAsync("UserSetAway", usuarioId);
+        await Clients.All.SendAsync("ConnectedUsersUpdated", GetConnectedUsersWithStatus());
+    }
+
+    public async Task SetActive(string usuarioId)
+    {
+        Console.WriteLine($"✅ Usuario activo: {usuarioId}");
+        await Clients.All.SendAsync("UserSetActive", usuarioId);
+        await Clients.All.SendAsync("ConnectedUsersUpdated", GetConnectedUsersWithStatus());
+    }
+
+    public static List<UsuarioEstadoDto> GetConnectedUsersWithStatus()
+    {
+        var now = DateTime.UtcNow;
+        var timeout = TimeSpan.FromMinutes(1);
+
+        return _connections.Values
+            .GroupBy(u => u.UserId)
+            .Select(group =>
+            {
+                var conexiones = group.ToList();
+
+                var activo = conexiones.Any(c => now - c.LastHeartbeat <= timeout);
+                return new UsuarioEstadoDto
+                {
+                    UserId = group.Key,
+                    Status = activo ? "Activo" : "Inactivo"
+                };
+            })
+            .ToList();
     }
 
     public static void DisconnectInactiveUsers(TimeSpan timeout)
@@ -55,8 +87,17 @@ public class PresenceHub : Hub
         {
             if (now - conn.LastHeartbeat > timeout)
             {
-                _connections.TryRemove(conn.ConnectionId, out _);
+                _connections.TryRemove(conn.ConnectionId, out var removed);
+                if (removed != null)
+                {
+                    Console.WriteLine($"🔌 Usuario desconectado por inactividad: {removed.UserId}");
+                }
             }
         }
+    }
+
+    public static bool TryRemoveConnection(string connectionId, out UserConnection? user)
+    {
+        return _connections.TryRemove(connectionId, out user!);
     }
 }

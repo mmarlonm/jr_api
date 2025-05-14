@@ -157,7 +157,7 @@ public class AuthController : ControllerBase
     [HttpGet("conectados")]
     public IActionResult GetConectados()
     {
-        var usuarios = PresenceHub.GetConnectedUserIds();
+        var usuarios = PresenceHub.GetConnectedUsersWithStatus();
         return Ok(usuarios);
     }
 }
