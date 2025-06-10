@@ -4,10 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BCrypt.Net;
-using System.Linq;  // Asegúrate de tener este espacio de nombres para LINQ
-using Org.BouncyCastle.Asn1.Cms;
 using Microsoft.AspNetCore.Authorization;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -36,8 +36,8 @@ public class AuthController : ControllerBase
             return Unauthorized("Usuario o contraseña incorrectos.");
 
         string avatarBase64 = usuario.Avatar != null
-            ? $"data:image/png;base64,{Convert.ToBase64String(usuario.Avatar)}"
-            : null;
+    ? ResizeImageWithImageSharp(usuario.Avatar)
+    : null;
 
         var roles = _context.UsuarioRoles
             .Where(ur => ur.UsuarioId == usuario.UsuarioId)
@@ -113,6 +113,29 @@ public class AuthController : ControllerBase
             }
         });
     }
+
+    private string ResizeImageWithImageSharp(byte[] imageBytes, int maxWidth = 150, int maxHeight = 150, int quality = 85)
+    {
+        using var image = Image.Load(imageBytes);
+
+        image.Mutate(x => x.Resize(new ResizeOptions
+        {
+            Mode = ResizeMode.Max,
+            Size = new Size(maxWidth, maxHeight)
+        }));
+
+        var encoder = new JpegEncoder
+        {
+            Quality = quality // entre 80 y 90 es ideal
+        };
+
+        using var ms = new MemoryStream();
+        image.Save(ms, encoder);
+        var resizedBytes = ms.ToArray();
+
+        return $"data:image/jpeg;base64,{Convert.ToBase64String(resizedBytes)}";
+    }
+
 
     private string GenerarToken(Usuario usuario, List<string> roles, List<string> permisos)
     {

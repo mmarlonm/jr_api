@@ -44,13 +44,15 @@ namespace jr_api.Services
             }
             
         }
+
         public async Task<object> GetProspectoById(int id)
         {
             ResponseDTO res = new ResponseDTO();
             try
             {
-
                 var prospecto = await _context.Prospectos
+                    .Include(p => p.Telefonos)
+                    .Include(p => p.Emails)
                     .FirstOrDefaultAsync(p => p.ProspectoId == id);
 
                 if (prospecto == null)
@@ -59,21 +61,61 @@ namespace jr_api.Services
                     res.Message = "Prospecto no encontrado";
                     return res;
                 }
+
+                // Armado de la respuesta con las listas anidadas
                 res.Code = 200;
                 res.Message = "";
-                res.data = prospecto;
-                return res;
+                res.data = new
+                {
+                    prospecto.ProspectoId,
+                    prospecto.Empresa,
+                    prospecto.Contacto,
+                    prospecto.Telefono,
+                    prospecto.Puesto,
+                    prospecto.GiroEmpresa,
+                    prospecto.Email,
+                    prospecto.AreaInteres,
+                    prospecto.TipoEmpresa,
+                    prospecto.UsuarioId,
+                    prospecto.ComoSeObtuvo,
+                    prospecto.Otros,
+                    prospecto.PersonalSeguimiento,
+                    prospecto.Active,
+                    prospecto.Latitud,
+                    prospecto.Longitud,
+                    prospecto.RelacionComercial,
+                    prospecto.Descripcion,
+                    prospecto.Seguimiento,
+                    prospecto.Llamada,
+                    prospecto.Observaciones,
+                    prospecto.FechaAccion,
+                    prospecto.CanalMedio,
+                    emails = prospecto.Emails?.Select(e => new
+                    {
+                        id = e.Id,
+                        email = e.Email,
+                        descripcion = e.Descripcion
+                    }).ToList(),
+                    telefonos = prospecto.Telefonos?.Select(t => new
+                    {
+                        id = t.Id,
+                        telefono = t.Telefono,
+                        descripcion = t.Descripcion
+                    }).ToList()
+                };
 
+                return res;
             }
             catch (Exception ex)
             {
                 res.Code = 500;
-                res.Message = "Error al encontrar prospecto " + ex;
+                res.Message = "Error al encontrar prospecto: " + ex.Message;
                 res.data = "";
                 return res;
             }
         }
-        public async Task<object> SaveProspecto( Prospecto request)
+
+        public async Task<object> SaveProspecto(Prospecto request)
         {
             ResponseDTO res = new ResponseDTO();
             try
@@ -82,11 +124,29 @@ namespace jr_api.Services
                 {
                     request.FechaRegistro = DateTime.UtcNow;
                     request.Active = true;
+
+                    // Asegura que los teléfonos/emails tengan el ProspectoId en 0 (para evitar conflictos)
+                    if (request.Telefonos != null)
+                    {
+                        foreach (var tel in request.Telefonos)
+                            tel.ProspectoId = 0;
+                    }
+
+                    if (request.Emails != null)
+                    {
+                        foreach (var email in request.Emails)
+                            email.ProspectoId = 0;
+                    }
+
                     _context.Prospectos.Add(request);
                 }
                 else
                 {
-                    var existing = await _context.Prospectos.FindAsync(request.ProspectoId);
+                    var existing = await _context.Prospectos
+                        .Include(p => p.Telefonos)
+                        .Include(p => p.Emails)
+                        .FirstOrDefaultAsync(p => p.ProspectoId == request.ProspectoId);
+
                     if (existing == null)
                     {
                         res.Code = 500;
@@ -94,6 +154,7 @@ namespace jr_api.Services
                         return res;
                     }
 
+                    // Actualiza campos base
                     existing.Empresa = request.Empresa;
                     existing.Contacto = request.Contacto;
                     existing.Telefono = request.Telefono;
@@ -106,22 +167,58 @@ namespace jr_api.Services
                     existing.ComoSeObtuvo = request.ComoSeObtuvo;
                     existing.Otros = request.Otros;
                     existing.PersonalSeguimiento = request.PersonalSeguimiento;
+                    existing.Longitud = request.Longitud;
+                    existing.Latitud = request.Latitud;
+                    existing.RelacionComercial = request.RelacionComercial;
+                    existing.Descripcion = request.Descripcion;
+                    existing.Seguimiento = request.Seguimiento;
+                    existing.Llamada = request.Llamada;
+                    existing.Observaciones = request.Observaciones;
+                    existing.FechaAccion = request.FechaAccion;
+                    existing.CanalMedio = request.CanalMedio;
+
+                    // 🔄 Reemplaza teléfonos
+                    _context.ProspectoTelefonos.RemoveRange(existing.Telefonos);
+                    if (request.Telefonos != null && request.Telefonos.Any())
+                    {
+                        existing.Telefonos = request.Telefonos.Select(t => new ProspectoTelefono
+                        {
+                            Telefono = t.Telefono,
+                            Descripcion = t.Descripcion,
+                            ProspectoId = existing.ProspectoId
+                        }).ToList();
+                    }
+
+                    // 🔄 Reemplaza emails
+                    _context.ProspectoEmails.RemoveRange(existing.Emails);
+                    if (request.Emails != null && request.Emails.Any())
+                    {
+                        existing.Emails = request.Emails.Select(e => new ProspectoEmail
+                        {
+                            Email = e.Email,
+                            Descripcion = e.Descripcion,
+                            ProspectoId = existing.ProspectoId
+                        }).ToList();
+                    }
 
                     _context.Prospectos.Update(existing);
-                    
                 }
+
                 await _context.SaveChangesAsync();
                 res.Code = 200;
                 res.Message = "Prospecto guardado exitosamente";
                 res.data = request.ProspectoId;
                 return res;
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 res.Code = 500;
-                res.Message = "Error al guardar prospecto "+ e.Message;
+                res.Message = "Error al guardar prospecto: " + e.Message;
                 return res;
             }
         }
+
+
         public async Task<Object> DeleteProspecto(int id)
         {
             ResponseDTO res = new ResponseDTO();
@@ -224,12 +321,6 @@ namespace jr_api.Services
 
             return nota;
         }
-
-
-
-
-
-
     }
 }
 

@@ -29,4 +29,39 @@ public class Prospecto
     public bool Active { get; set; }
 
     public ICollection<SeguimientoProspecto>? Seguimientos { get; set; }
+    public ICollection<ProspectoTelefono> Telefonos { get; set; }
+    public ICollection<ProspectoEmail> Emails { get; set; }
+
+    // 📍 NUEVO: Ubicación
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
+
+    public string? RelacionComercial { get; set; }
+    public string? Descripcion { get; set; }
+    public string? Seguimiento { get; set; }
+    public string? Llamada { get; set; }
+    public string? Observaciones { get; set; }
+    public string? FechaAccion { get; set; }
+    public string? CanalMedio { get; set; }
+}
+
+
+public class ProspectoTelefono
+{
+    public int? Id { get; set; }
+    public string Telefono { get; set; }
+    public string Descripcion { get; set; }
+    public int? ProspectoId { get; set; }
+
+    public Prospecto? Prospecto { get; set; }
+}
+
+public class ProspectoEmail
+{
+    public int? Id { get; set; }
+    public string Email { get; set; }
+    public string Descripcion { get; set; }
+    public int? ProspectoId { get; set; }
+
+    public Prospecto? Prospecto { get; set; }
 }
