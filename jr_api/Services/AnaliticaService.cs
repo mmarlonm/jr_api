@@ -81,5 +81,45 @@ namespace jr_api.Services
                 TotalProductos = totalProductos
             };
         }
+
+
+        public async Task<List<UbicacionDto>> ObtenerMapaAsync(string tipo)
+        {
+            var ubicaciones = new List<UbicacionDto>();
+
+            using (var connection = _context.Database.GetDbConnection())
+            {
+                await connection.OpenAsync();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "usp_ObtenerUbicacionesMapa";
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    var tipoParam = command.CreateParameter();
+                    tipoParam.ParameterName = "@tipo";
+                    tipoParam.Value = tipo;
+                    tipoParam.DbType = DbType.String;
+                    command.Parameters.Add(tipoParam);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ubicaciones.Add(new UbicacionDto
+                            {
+                                Id = reader.GetInt32(0),
+                                Nombre = reader.GetString(1),
+                                Latitud = reader.IsDBNull(2) ? null : reader.GetDouble(2),
+                                Longitud = reader.IsDBNull(3) ? null : reader.GetDouble(3),
+                                Tipo = reader.GetString(4)
+                            });
+                        }
+                    }
+                }
+            }
+
+            return ubicaciones;
+        }
     }
 }

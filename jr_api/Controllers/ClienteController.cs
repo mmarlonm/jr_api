@@ -73,7 +73,9 @@ namespace TuProyecto.Api.Controllers
                     RFC = request.RFC,
                     Activo = true,
                     FechaRegistro = DateTime.UtcNow,
-                    Calificacion = request.Calificacion
+                    Calificacion = request.Calificacion,
+                    Latitud = request.Latitud,
+                    Longitud = request.Longitud
                 };
 
                 _context.Clientes.Add(cliente);
@@ -100,6 +102,8 @@ namespace TuProyecto.Api.Controllers
                 cliente.RFC = request.RFC;
                 cliente.Activo = request.Activo;
                 cliente.Calificacion = request.Calificacion;
+                cliente.Latitud = request.Latitud;
+                cliente.Longitud = request.Longitud;
             }
 
             await _context.SaveChangesAsync();
@@ -197,5 +201,8 @@ namespace TuProyecto.Api.Controllers
         public string? RFC { get; set; }
         public bool Activo { get; set; }
         public int? Calificacion { get; set; }
+        // 📍 NUEVO: Ubicación
+        public double? Latitud { get; set; }
+        public double? Longitud { get; set; }
     }
 }

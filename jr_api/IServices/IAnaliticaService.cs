@@ -11,6 +11,8 @@ namespace jr_api.IServices
         /// </summary>
         /// <returns>Un DTO con las listas de resumen por estatus para proyectos y cotizaciones.</returns>
         Task<ResumenAnaliticoDto> ObtenerResumenAnaliticoPorEstatusAsync();
+
+        Task<List<UbicacionDto>> ObtenerMapaAsync(string tipo);
     }
 }
 

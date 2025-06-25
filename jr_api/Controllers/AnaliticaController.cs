@@ -18,4 +18,19 @@ public class AnaliticaController : ControllerBase
         var resultado = await _analiticaService.ObtenerResumenAnaliticoPorEstatusAsync();
         return Ok(resultado);
     }
+
+    [HttpGet("mapa")]
+    public async Task<IActionResult> GetMapa(string tipo)
+    {
+        try
+        {
+            var resultado = await _analiticaService.ObtenerMapaAsync(tipo);
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            // Puedes loguear o retornar el error explícitamente mientras desarrollas
+            return StatusCode(500, $"Error interno: {ex.Message}");
+        }
+    }
 }

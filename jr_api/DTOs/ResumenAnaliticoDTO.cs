@@ -20,3 +20,12 @@ public class AnaliticaResumenCotizacion
     public string EstatusNombre { get; set; }
     public int TotalCotizaciones { get; set; }
 }
+
+public class UbicacionDto
+{
+    public int Id { get; set; }
+    public string Nombre { get; set; }
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
+    public string Tipo { get; set; } // "Prospecto" o "Cliente"
+}

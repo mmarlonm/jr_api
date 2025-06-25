@@ -25,6 +25,7 @@ builder.Services.AddScoped<IVentaService, VentaService>();
 builder.Services.AddScoped<IProyectoService, ProyectoService>();
 builder.Services.AddScoped<ICotizacionService, CotizacionService>();
 builder.Services.AddHostedService<InactivityChecker>();
+builder.Services.AddScoped<ICotizacionProductoService, CotizacionProductoService>();
 
 // Configuración de la base de datos
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

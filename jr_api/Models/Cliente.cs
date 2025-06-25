@@ -48,4 +48,7 @@ public class Cliente
 
     public bool Activo { get; set; } = true;
     public int? Calificacion { get; set; }
+    // 📍 NUEVO: Ubicación
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
 }
