@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
-
+using Microsoft.EntityFrameworkCore;
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -25,7 +25,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        var usuario = _context.Usuarios.SingleOrDefault(u => u.Email == request.Username);
+        var usuario = _context.Usuarios.AsNoTracking().SingleOrDefault(u => u.Email == request.Username);
+
         if (usuario == null)
             return Unauthorized("Usuario o contraseña incorrectos.");
 

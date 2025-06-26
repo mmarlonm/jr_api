@@ -17,21 +17,15 @@ public class ProfileController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("me")]
-    public IActionResult GetProfile()
+    [HttpGet("me/{id}")]
+    public IActionResult GetProfile(int id)
     {
         try
         {
-            // Obtener el ID del usuario autenticado desde el token JWT
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-                return Unauthorized(new { message = "Usuario no autenticado" });
-
-            int userId = int.Parse(userIdClaim.Value);
 
             // Buscar al usuario en la base de datos
             var usuario = _context.Usuarios
-                .Where(u => u.UsuarioId == userId)
+                .Where(u => u.UsuarioId == id)
                 .Select(u => new
                 {
                     u.UsuarioId,
@@ -39,7 +33,20 @@ public class ProfileController : ControllerBase
                     u.Email,
                     u.Telefono,
                     u.Activo,
-                    Avatar = u.Avatar != null ? Convert.ToBase64String(u.Avatar) : null // Convertir avatar a Base64
+                    Avatar = u.Avatar != null ? Convert.ToBase64String(u.Avatar) : null, // Convertir avatar a Base64
+                    UsuarioInformacion = u.UsuarioInformacion != null ? new
+                    {
+                        u.UsuarioInformacion.UsuarioInformacionId,
+                        u.UsuarioInformacion.Sexo,
+                        u.UsuarioInformacion.FechaNacimiento,
+                        u.UsuarioInformacion.NumeroContacto1,
+                        u.UsuarioInformacion.NumeroContacto2,
+                        u.UsuarioInformacion.NombreContacto1,
+                        u.UsuarioInformacion.NombreContacto2,
+                        u.UsuarioInformacion.Parentesco1,
+                        u.UsuarioInformacion.Parentesco2,
+                        u.UsuarioInformacion.Direccion
+                    } : null
                 })
                 .FirstOrDefault();
 
@@ -93,6 +100,12 @@ public class ProfileController : ControllerBase
     public async Task<IActionResult> UpdateUser([FromBody] UserUpdateRequest request)
     {
         var usuario = await _context.Usuarios.FindAsync(request.id);
+        var UsuarioInformacion = new UsuarioInformacion();
+        var _UsuarioInformacion = await _context.UsuarioInformacion.FindAsync(request.UsuarioInformacion.UsuarioInformacionId);
+        if (_UsuarioInformacion != null)
+        {
+            UsuarioInformacion = _UsuarioInformacion;
+        }
 
         if (usuario == null)
             return NotFound("Usuario no encontrado.");
@@ -102,7 +115,36 @@ public class ProfileController : ControllerBase
         usuario.Telefono = request.Telefono ?? usuario.Telefono;
         usuario.Activo = request.Activo ?? usuario.Activo;
 
-        _context.Usuarios.Update(usuario);
+        if(request.UsuarioInformacion.UsuarioInformacionId == 0) {
+            UsuarioInformacion.UsuarioId = request.id;
+            UsuarioInformacion.Sexo = request.UsuarioInformacion.Sexo;
+            UsuarioInformacion.FechaNacimiento = request.UsuarioInformacion.FechaNacimiento;
+            UsuarioInformacion.NumeroContacto1 = request.UsuarioInformacion.NumeroContacto1;
+            UsuarioInformacion.NumeroContacto2 = request.UsuarioInformacion.NumeroContacto2;
+            UsuarioInformacion.NombreContacto1 = request.UsuarioInformacion.NombreContacto1;
+            UsuarioInformacion.NombreContacto2 = request.UsuarioInformacion.NombreContacto2;
+            UsuarioInformacion.Parentesco1 = request.UsuarioInformacion.Parentesco1;
+            UsuarioInformacion.Parentesco2 = request.UsuarioInformacion.Parentesco2;
+            UsuarioInformacion.Direccion = request.UsuarioInformacion.Direccion;
+            _context.UsuarioInformacion.Add(UsuarioInformacion);
+        }
+        else
+        {
+            UsuarioInformacion.UsuarioId = usuario.UsuarioId;
+            UsuarioInformacion.Sexo = request.UsuarioInformacion.Sexo;
+            UsuarioInformacion.FechaNacimiento = request.UsuarioInformacion.FechaNacimiento;
+            UsuarioInformacion.NumeroContacto1 = request.UsuarioInformacion.NumeroContacto1;
+            UsuarioInformacion.NumeroContacto2 = request.UsuarioInformacion.NumeroContacto2;
+            UsuarioInformacion.NombreContacto1 = request.UsuarioInformacion.NombreContacto1;
+            UsuarioInformacion.NombreContacto2 = request.UsuarioInformacion.NombreContacto2;
+            UsuarioInformacion.Parentesco1 = request.UsuarioInformacion.Parentesco1;
+            UsuarioInformacion.Parentesco2 = request.UsuarioInformacion.Parentesco2;
+            UsuarioInformacion.Direccion = request.UsuarioInformacion.Direccion;
+            _context.UsuarioInformacion.Update(UsuarioInformacion);
+        }
+            _context.Usuarios.Update(usuario);
+
+
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Perfil actualizado correctamente." });
@@ -306,12 +348,16 @@ public class ProfileController : ControllerBase
 
 public class UserUpdateRequest
 {
+    public int UsuarioInformacionId { get; set; }
     public string? NombreUsuario { get; set; }
     public string? Email { get; set; }
     public string? Telefono { get; set; }
     public bool? Activo { get; set; }
     public int id { get; set; }
+    public UsuarioInformacion UsuarioInformacion { get; set; }
+
 }
+
 
 public class PasswordUpdateRequest
 {

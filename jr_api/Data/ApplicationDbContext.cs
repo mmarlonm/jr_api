@@ -35,6 +35,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ProspectoTelefono> ProspectoTelefonos { get; set; }
     public DbSet<ProspectoEmail> ProspectoEmails { get; set; }
     public DbSet<CotizacionProducto> CotizacionProductos { get; set; }
+    public DbSet<UsuarioInformacion> UsuarioInformacion { get; set; }
 
     //tablas venta
     public DbSet<Venta> Ventas { get; set; }

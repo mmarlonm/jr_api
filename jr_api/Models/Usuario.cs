@@ -13,11 +13,13 @@ namespace jr_api.Models
             public string ContraseñaHash { get; set; }
             public string ContraseñaSalt { get; set; }
             public byte[]? Avatar { get; set; }
+
+
             public ICollection<UsuarioRol> UsuarioRoles { get; set; }
             // 🔗 Navegación a Prospectos
             public ICollection<Prospecto?> Prospectos { get; set; }
             public ICollection<Proyecto?> Proyectos { get; set; }
-
+            public UsuarioInformacion UsuarioInformacion { get; set; }
     }
 }
 
